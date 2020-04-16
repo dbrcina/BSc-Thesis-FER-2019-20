@@ -2,8 +2,8 @@ package hr.fer.zemris.fthesis.afunction;
 
 public interface ActivationFunction {
 
-    double valueAt(double net);
+    double valueAt(double x);
 
-    double deriveValueAt(double net);
+    double derivativeValueAt(double x);
 
 }

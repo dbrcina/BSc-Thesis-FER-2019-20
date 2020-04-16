@@ -8,9 +8,9 @@ public class TANH implements ActivationFunction {
     }
 
     @Override
-    public double deriveValueAt(double net) {
-        SIGM sigm = new SIGM();
-        return 2 * sigm.valueAt(2 * net) - 1;
+    public double derivativeValueAt(double net) {
+        Sigmoid sigmoid = new Sigmoid();
+        return 2 * sigmoid.valueAt(2 * net) - 1;
     }
 
 }

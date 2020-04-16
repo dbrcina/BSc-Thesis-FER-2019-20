@@ -14,7 +14,7 @@ public class LRELU implements ActivationFunction {
     }
 
     @Override
-    public double deriveValueAt(double net) {
+    public double derivativeValueAt(double net) {
         return net > 0 ? 1 : alpha;
     }
 
