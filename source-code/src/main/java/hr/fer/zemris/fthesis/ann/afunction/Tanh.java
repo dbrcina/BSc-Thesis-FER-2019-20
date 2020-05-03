@@ -1,4 +1,4 @@
-package hr.fer.zemris.fthesis.afunction;
+package hr.fer.zemris.fthesis.ann.afunction;
 
 public class Tanh implements ActivationFunction {
 

@@ -1,9 +1,13 @@
 package hr.fer.zemris.fthesis.ann;
 
-import hr.fer.zemris.fthesis.afunction.ActivationFunction;
-import hr.fer.zemris.fthesis.dataset.ReadOnlyDataset;
+import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
+import hr.fer.zemris.fthesis.ann.dataset.ReadOnlyDataset;
+import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Feed forward artificial neural network <i>(Multilayer perceptron)</i>.
@@ -23,6 +27,7 @@ public class FFANN {
     private double[][] derivativesPerLayer; // activationFunction.derivativeValueAt(net)
     private double[][] deltasPerLayer;
 
+    // constructor
     public FFANN(int[] layers, ActivationFunction activationFunction, ReadOnlyDataset dataset) {
         this.layers = layers;
         this.activationFunction = activationFunction;
@@ -38,14 +43,14 @@ public class FFANN {
         outputsPerLayer = new double[numberOfLayers][];
         derivativesPerLayer = new double[numberOfLayers - 1][];
         deltasPerLayer = new double[numberOfLayers - 1][];
-        for (int layer = 0; layer < numberOfLayers; layer++) {
-            if (layer != numberOfLayers - 1) {
-                weightsPerLayer[layer] = new double[layers[layer + 1]][layers[layer]];
-                biasesPerLayer[layer] = new double[layers[layer + 1]];
-                derivativesPerLayer[layer] = new double[layers[layer + 1]];
-                deltasPerLayer[layer] = new double[layers[layer + 1]];
+        for (int i = 0; i < numberOfLayers; i++) {
+            if (i != numberOfLayers - 1) {
+                weightsPerLayer[i] = new double[layers[i + 1]][layers[i]];
+                biasesPerLayer[i] = new double[layers[i + 1]];
+                derivativesPerLayer[i] = new double[layers[i + 1]];
+                deltasPerLayer[i] = new double[layers[i + 1]];
             }
-            outputsPerLayer[layer] = new double[layers[layer]];
+            outputsPerLayer[i] = new double[layers[i]];
         }
         randomizeWeightsBiases();
     }
@@ -56,8 +61,8 @@ public class FFANN {
         for (int k = 0; k < layers.length - 1; k++) {
             double[][] weightsLayerK = weightsPerLayer[k];
             double[] biasesLayerK = biasesPerLayer[k];
+            int m = k == 0 ? 1 : weightsLayerK[0].length + 1;
             for (int row = 0; row < weightsLayerK.length; row++) {
-                int m = k == 0 ? 1 : weightsLayerK[0].length + 1;
                 for (int column = 0; column < weightsLayerK[0].length; column++) {
                     weightsLayerK[row][column] = -2.4 / m + rand.nextDouble() * 4.8 / m;
                 }
@@ -67,7 +72,7 @@ public class FFANN {
     }
 
     /**
-     * Feed forwards provided <i>input</i> and returns result as a 2-dimensional array where first
+     * Feed forwards provided <i>inputs</i> and returns result as a 2-dimensional array where first
      * dimension is a number of layer and other is outputs.
      *
      * @param inputs inputs.
@@ -107,29 +112,29 @@ public class FFANN {
         for (int iter = 0; iter < iterLimit; iter++) {
             double error = 0.0;
             // for every sample..
-            for (int s = 0; s < dataset.numberOfSamples(); s++) {
-                Map.Entry<double[], double[]> sample = dataset.inputsOutputsPair(s);
+            for (int i = 0; i < dataset.numberOfSamples(); i++) {
+                Sample sample = dataset.getSample(i);
                 // feed forward, calculate outputs for every layer
-                feedForward(sample.getKey());
+                feedForward(sample.getInputs());
                 // calculate error
-                double[] expectedOutputs = sample.getValue();
+                double[] expectedOutputs = sample.getOutputs();
                 double[] actualOutputs = outputsPerLayer[outputsPerLayer.length - 1];
-                for (int i = 0; i < expectedOutputs.length; i++) {
-                    error += Math.pow(expectedOutputs[i] - actualOutputs[i], 2);
+                for (int j = 0; j < expectedOutputs.length; j++) {
+                    error += Math.pow(expectedOutputs[j] - actualOutputs[j], 2);
                 }
                 // calculate deltas for every layer
-                deltasPerLayer(sample.getValue());
+                deltasPerLayer(sample.getOutputs());
                 // update weights and biases
                 for (int k = 0; k < weightsPerLayer.length; k++) {
                     double[][] weightsLayerK = weightsPerLayer[k];
                     double[] biasesLayerK = biasesPerLayer[k];
                     double[] outputsLayerK = outputsPerLayer[k];
                     double[] deltasLayerK = deltasPerLayer[k];
-                    for (int i = 0; i < weightsLayerK.length; i++) {
-                        for (int j = 0; j < weightsLayerK[0].length; j++) {
-                            weightsLayerK[i][j] += eta * outputsLayerK[j] * deltasLayerK[i];
+                    for (int r = 0; r < weightsLayerK.length; r++) {
+                        for (int c = 0; c < weightsLayerK[0].length; c++) {
+                            weightsLayerK[r][c] += eta * outputsLayerK[c] * deltasLayerK[r];
                         }
-                        biasesLayerK[i] += eta * deltasLayerK[i];
+                        biasesLayerK[r] += eta * deltasLayerK[r];
                     }
                 }
             }
@@ -182,9 +187,9 @@ public class FFANN {
         List<String> badInputs = new ArrayList<>();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < numberOfSamples; i++) {
-            Map.Entry<double[], double[]> sample = dataset.inputsOutputsPair(i);
-            double[] inputs = sample.getKey();
-            double[] expectedOutputs = sample.getValue();
+            Sample sample = dataset.getSample(i);
+            double[] inputs = sample.getInputs();
+            double[] expectedOutputs = sample.getOutputs();
             feedForward(inputs);
             double[] actualOutputs = outputsPerLayer[outputsPerLayer.length - 1];
             for (int j = 0; j < actualOutputs.length; j++) {
