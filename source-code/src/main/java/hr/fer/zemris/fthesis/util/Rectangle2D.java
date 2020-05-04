@@ -1,4 +1,4 @@
-package hr.fer.zemris.fthesis.gui;
+package hr.fer.zemris.fthesis.util;
 
 public class Rectangle2D {
 

@@ -1,5 +1,7 @@
 package hr.fer.zemris.fthesis.ann.dataset.model;
 
+import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassType;
+
 /**
  * Models one sample used for training ANN. Each sample consists of:
  * <ul>
@@ -7,13 +9,12 @@ package hr.fer.zemris.fthesis.ann.dataset.model;
  *     <li>outputs,</li>
  *     <li>class type - {@link ClassType}</li>
  * </ul>
- * Initially, class type is set to {@link ClassType#NONE}.
  */
 public class Sample {
 
     private final double[] inputs;
     private final double[] outputs;
-    private ClassType classType = ClassType.NONE;
+    private ClassType classType;
 
     public Sample(double[] inputs, double[] outputs) {
         this.inputs = inputs;

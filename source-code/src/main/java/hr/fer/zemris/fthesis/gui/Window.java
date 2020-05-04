@@ -1,7 +1,18 @@
 package hr.fer.zemris.fthesis.gui;
 
-import hr.fer.zemris.fthesis.ann.dataset.model.ClassType;
+import hr.fer.zemris.fthesis.ann.FFANN;
+import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
+import hr.fer.zemris.fthesis.ann.afunction.LReLU;
+import hr.fer.zemris.fthesis.ann.afunction.Sigmoid;
+import hr.fer.zemris.fthesis.ann.afunction.Tanh;
+import hr.fer.zemris.fthesis.ann.dataset.Cartesian2DDataset;
+import hr.fer.zemris.fthesis.ann.dataset.ReadOnlyDataset;
 import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
+import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassA;
+import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassB;
+import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassC;
+import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassType;
+import hr.fer.zemris.fthesis.util.Rectangle2D;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -12,17 +23,22 @@ import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.List;
-
-import static hr.fer.zemris.fthesis.ann.dataset.model.ClassType.*;
 
 public class Window extends JFrame {
 
-    // ----Canvas component---- //
+    // ----HELPER VARIABLES---- //
+    private static final List<Sample> samples = new ArrayList<>();
+    private static boolean training;
+    private static FFANN ffann;
+    // ------------------------ //
+
+    // ----CANVAS COMPONENT---- //
     private static final int CANVAS_WIDTH = 500;
     private static final int CANVAS_HEIGHT = 500;
-    private final List<Sample> samples = new ArrayList<>();
-    private JComponent myCanvas;
+    private JComponent canvas;
     // ------------------------ //
 
     // ----OPTIONS PANEL---- //
@@ -37,16 +53,19 @@ public class Window extends JFrame {
     private JTextField fldIter;
     private JLabel lblErr;
     private JTextField fldErr;
+    private ButtonGroup btnGroup;
     private JRadioButton btnSigmoid;
     private JRadioButton btnReLu;
     private JRadioButton btnTanh;
     private JButton btnTrain;
     private JButton btnStop;
+    private JButton btnDeleteLast;
+    private JButton btnClearAll;
     // -------------------- //
 
-    // --- Class type stuff --- //
-    private final List<ClassType> classTypes = List.of(CLASS_A, CLASS_B, CLASS_C);
-    private ClassType currentClassType = CLASS_A;
+    // --- CLASS TYPE STUFF --- //
+    private final List<ClassType> classTypes = List.of(new ClassA(), new ClassB(), new ClassC());
+    private ClassType currentClassType = classTypes.get(0);
     // ------------------------ //
 
     public Window() {
@@ -87,7 +106,7 @@ public class Window extends JFrame {
         lblIter = new JLabel("IterLimit:");
         fldIter = new JTextField("100000", 7);
         lblEta = new JLabel("Eta:");
-        fldEta = new JTextField("0,1", 5);
+        fldEta = new JTextField("0.1", 5);
         lblErr = new JLabel("MaxError:");
         fldErr = new JTextField("0.02", 5);
         panelParams.add(lblIter);
@@ -115,7 +134,7 @@ public class Window extends JFrame {
             public void changedUpdate(DocumentEvent e) {
             }
         });
-        fldClassType.setText(currentClassType.name());
+        fldClassType.setText(currentClassType.toString());
         panelClassType.add(lblClassType);
         panelClassType.add(fldClassType);
         panelOptions.add(panelClassType);
@@ -123,14 +142,14 @@ public class Window extends JFrame {
 
     private void addFourthRow() {
         JPanel panelButtons = new JPanel();
-        ButtonGroup group = new ButtonGroup();
+        btnGroup = new ButtonGroup();
         btnSigmoid = new JRadioButton("Sigmoid neuron");
         btnSigmoid.setSelected(true);
         btnReLu = new JRadioButton("ReLu neuron");
         btnTanh = new JRadioButton("Tanh neuron");
-        group.add(btnSigmoid);
-        group.add(btnReLu);
-        group.add(btnTanh);
+        btnGroup.add(btnSigmoid);
+        btnGroup.add(btnReLu);
+        btnGroup.add(btnTanh);
         panelButtons.add(btnSigmoid);
         panelButtons.add(btnReLu);
         panelButtons.add(btnTanh);
@@ -144,16 +163,86 @@ public class Window extends JFrame {
         btnStop = new JButton("Stop");
         btnStop.setFocusPainted(false);
         btnStop.setEnabled(false);
+        btnDeleteLast = new JButton("Delete last sample");
+        btnDeleteLast.setFocusPainted(false);
+        btnDeleteLast.setEnabled(false);
+        btnClearAll = new JButton("Clear all samples");
+        btnClearAll.setFocusPainted(false);
+        btnClearAll.setEnabled(false);
         panelButtons.add(btnTrain);
         panelButtons.add(btnStop);
+        panelButtons.add(btnDeleteLast);
+        panelButtons.add(btnClearAll);
         panelOptions.add(panelButtons);
+        addActionsToButtons();
+    }
+
+    private void addActionsToButtons() {
+        btnDeleteLast.addActionListener(evt -> {
+            samples.remove(samples.size() - 1);
+            if (samples.isEmpty()) {
+                btnDeleteLast.setEnabled(false);
+                btnClearAll.setEnabled(false);
+            }
+            canvas.repaint();
+        });
+        btnClearAll.addActionListener(evt -> {
+            samples.clear();
+            btnDeleteLast.setEnabled(false);
+            btnClearAll.setEnabled(false);
+            canvas.repaint();
+        });
+        btnTrain.addActionListener(evt -> {
+            int[] hiddenLayers = Arrays.stream(fldHiddenLayers.getText().split(","))
+                    .mapToInt(Integer::parseInt)
+                    .toArray();
+            int[] layers = new int[1 + hiddenLayers.length + 1];
+            // input layer
+            layers[0] = 2;
+            // output layer
+            layers[layers.length - 1] = classTypes.size();
+            // hidden layers
+            int offset = 1;
+            for (int hLayer : hiddenLayers) {
+                layers[offset++] = hLayer;
+            }
+            Enumeration<AbstractButton> buttons = btnGroup.getElements();
+            ActivationFunction activationFunction = null;
+            while (buttons.hasMoreElements()) {
+                AbstractButton btn = buttons.nextElement();
+                if (btn.isSelected()) {
+                    switch (btn.getText().split("\\s+")[0]) {
+                        case "Sigmoid":
+                            activationFunction = new Sigmoid();
+                            break;
+                        case "ReLu":
+                            activationFunction = new LReLU(0.2);
+                            break;
+                        case "Tanh":
+                            activationFunction = new Tanh();
+                            break;
+                        default:
+                    }
+                    break;
+                }
+            }
+            ReadOnlyDataset dataset = new Cartesian2DDataset(samples);
+            ffann = new FFANN(layers, activationFunction, dataset);
+            int iterLimit = Integer.parseInt(fldIter.getText());
+            double maxError = Double.parseDouble(fldErr.getText());
+            double eta = Double.parseDouble(fldEta.getText());
+            ffann.train(iterLimit, maxError, eta);
+            training = true;
+            canvas.repaint();
+        });
     }
     // ------------------------------------- //
 
+    // ---- INITIALIZE CANVAS COMPONENT ! ----- //
     private void initCanvasComponent() {
-        myCanvas = new CanvasComponent(CANVAS_WIDTH, CANVAS_HEIGHT, samples);
-        myCanvas.addMouseListener(new MouseAdapter() {
-            int classTypesIndex = 0;
+        canvas = new CanvasComponent(CANVAS_WIDTH, CANVAS_HEIGHT);
+        canvas.addMouseListener(new MouseAdapter() {
+            private int classTypesIndex = 0;
 
             public void mouseClicked(MouseEvent e) {
                 if (SwingUtilities.isRightMouseButton(e)) {
@@ -163,26 +252,32 @@ public class Window extends JFrame {
                         classTypesIndex++;
                     }
                     currentClassType = classTypes.get(classTypesIndex);
-                    fldClassType.setText(currentClassType.name());
+                    fldClassType.setText(currentClassType.toString());
                 } else {
                     double[] inputs = {e.getX(), e.getY()};
                     double[] outputs = currentClassType.getOutputs();
                     Sample sample = new Sample(inputs, outputs);
                     sample.setClassType(currentClassType);
                     samples.add(sample);
-                    myCanvas.repaint();
+                    if (!btnDeleteLast.isEnabled()) {
+                        btnDeleteLast.setEnabled(true);
+                    }
+                    if (!btnClearAll.isEnabled()) {
+                        btnClearAll.setEnabled(true);
+                    }
+                    canvas.repaint();
                 }
             }
         });
-        getContentPane().add(myCanvas);
+        getContentPane().add(canvas);
     }
+    // ---------------------------------------- //
 
+    /**
+     * Canvas which represents Cartesian 2D coordinate system.
+     */
     private static class CanvasComponent extends JComponent {
-
-        private final List<Sample> samples;
-
-        public CanvasComponent(int width, int height, List<Sample> samples) {
-            this.samples = samples;
+        public CanvasComponent(int width, int height) {
             setPreferredSize(new Dimension(width, height));
             setBorder(new TitledBorder(new EtchedBorder(), "Canvas"));
         }
@@ -190,21 +285,61 @@ public class Window extends JFrame {
         @Override
         protected void paintComponent(Graphics g) {
             Rectangle2D grid = rectangularGrid();
-            g = g.create(grid.x, grid.y, grid.width, grid.height);
+            Graphics2D g2d = (Graphics2D) g.create(grid.x, grid.y, grid.width, grid.height);
 
             // clear background
-            g.setColor(Color.WHITE);
-            g.fillRect(0, 0, grid.width, grid.height);
+            g2d.setColor(Color.WHITE);
+            g2d.fillRect(0, 0, grid.width, grid.height);
 
-            g.setColor(Color.BLACK);
-            for (Sample s : samples) {
-                double[] inputs = s.getInputs();
+            boolean training = Window.training;
+            if (training) {
+                drawTraining(g2d, grid);
+            }
+            drawPoints(g2d, grid, training);
+        }
+
+        private void drawPoints(Graphics2D g2d, Rectangle2D grid, boolean training) {
+            g2d.setStroke(new BasicStroke(2));
+            for (Sample sample : samples) {
+                double[] inputs = sample.getInputs();
                 int x = (int) inputs[0] - grid.x;
                 int y = (int) inputs[1] - grid.y;
-                g.drawRect(x, y, 5, 5);
-
+                int width = 10;
+                int height = 10;
+                ClassType classType = sample.getClassType();
+                Shape shape = classType.createShape(new Rectangle2D(x, y, width, height));
+                if (training) {
+                    g2d.setColor(Color.WHITE);
+                    g2d.draw(shape);
+                } else {
+                    g2d.setColor(classType.getColor());
+                    g2d.fill(shape);
+                }
             }
+        }
 
+        private void drawTraining(Graphics2D g2d, Rectangle2D grid) {
+            for (int x = 0; x < grid.width; x++) {
+                for (int y = 0; y < grid.height; y++) {
+                    double[] inputs = {x, y};
+                    double[][] outputsPerLayers = ffann.feedForward(inputs);
+                    double[] outputs = outputsPerLayers[outputsPerLayers.length - 1];
+                    for (int i = 0; i < outputs.length; i++) {
+                        if (outputs[i] > 0.5) {
+                            outputs[i] = 1;
+                        } else {
+                            outputs[i] = 0;
+                        }
+                    }
+                    ClassType classType = ClassType.fromOutputs(outputs);
+                    if (classType == null) {
+                        g2d.setColor(Color.WHITE);
+                    } else {
+                        g2d.setColor(classType.getColor());
+                    }
+                    g2d.fillRect(x, y, 1, 1);
+                }
+            }
         }
 
         private Rectangle2D rectangularGrid() {
