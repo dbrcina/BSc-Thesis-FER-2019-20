@@ -8,9 +8,9 @@ import java.awt.*;
 public enum ClassType {
 
     NONE(Color.WHITE),
-    CLASS_A(Color.RED, 1, 0, 0),
+    CLASS_A(new Color(255, 102, 102), 1, 0, 0),
     CLASS_B(Color.GREEN, 0, 1, 0),
-    CLASS_C(Color.BLUE, 0, 0, 1);
+    CLASS_C(new Color(51, 204, 255), 0, 0, 1);
 
     private final double[] outputs;
     private final Color color;
