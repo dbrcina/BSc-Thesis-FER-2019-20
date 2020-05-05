@@ -64,9 +64,11 @@ public class FFANN {
             int m = k == 0 ? 1 : weightsLayerK[0].length + 1;
             for (int row = 0; row < weightsLayerK.length; row++) {
                 for (int column = 0; column < weightsLayerK[0].length; column++) {
-                    weightsLayerK[row][column] = -2.4 / m + rand.nextDouble() * 4.8 / m;
+                    //weightsLayerK[row][column] = -2.4 / m + rand.nextDouble() * 4.8 / m;
+                    weightsLayerK[row][column] = -0.5 + rand.nextDouble();
                 }
-                biasesLayerK[row] = -2.4 + rand.nextDouble() * 4.8;
+                //biasesLayerK[row] = -2.4 + rand.nextDouble() * 4.8;
+                biasesLayerK[row] = -0.5 + rand.nextDouble();
             }
         }
     }

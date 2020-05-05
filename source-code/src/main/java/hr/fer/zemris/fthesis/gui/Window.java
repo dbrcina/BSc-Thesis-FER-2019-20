@@ -1,8 +1,8 @@
 package hr.fer.zemris.fthesis.gui;
 
-import hr.fer.zemris.fthesis.ann.FFANN;
+import hr.fer.zemris.fthesis.ann.NeuralNetwork;
 import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.fthesis.ann.afunction.LReLU;
+import hr.fer.zemris.fthesis.ann.afunction.ReLU;
 import hr.fer.zemris.fthesis.ann.afunction.Sigmoid;
 import hr.fer.zemris.fthesis.ann.afunction.Tanh;
 import hr.fer.zemris.fthesis.ann.dataset.Cartesian2DDataset;
@@ -32,7 +32,7 @@ public class Window extends JFrame {
     // ----HELPER VARIABLES---- //
     private static final List<Sample> samples = new ArrayList<>();
     private static boolean training;
-    private static FFANN ffann;
+    private static NeuralNetwork nn;
     // ------------------------ //
 
     // ----CANVAS COMPONENT---- //
@@ -216,7 +216,7 @@ public class Window extends JFrame {
                             activationFunction = new Sigmoid();
                             break;
                         case "ReLu":
-                            activationFunction = new LReLU(0.2);
+                            activationFunction = new ReLU();
                             break;
                         case "Tanh":
                             activationFunction = new Tanh();
@@ -226,12 +226,18 @@ public class Window extends JFrame {
                     break;
                 }
             }
-            ReadOnlyDataset dataset = new Cartesian2DDataset(samples);
-            ffann = new FFANN(layers, activationFunction, dataset);
+            List<Sample> list = new ArrayList<>();
+            for (Sample s : samples) {
+                double[] sInputs = s.getInputs();
+                double[] inputs = {sInputs[0] / CANVAS_WIDTH, sInputs[1] / CANVAS_HEIGHT};
+                list.add(new Sample(inputs, s.getOutputs()));
+            }
+            ReadOnlyDataset dataset = new Cartesian2DDataset(list);
+            nn = new NeuralNetwork(layers, activationFunction, dataset);
             int iterLimit = Integer.parseInt(fldIter.getText());
             double maxError = Double.parseDouble(fldErr.getText());
             double eta = Double.parseDouble(fldEta.getText());
-            ffann.train(iterLimit, maxError, eta);
+            nn.train(iterLimit, maxError, eta);
             training = true;
             canvas.repaint();
         });
@@ -295,10 +301,11 @@ public class Window extends JFrame {
             if (training) {
                 drawTraining(g2d, grid);
             }
-            drawPoints(g2d, grid, training);
+            drawControlPoints(g2d, grid, training);
+            Window.training = false;
         }
 
-        private void drawPoints(Graphics2D g2d, Rectangle2D grid, boolean training) {
+        private void drawControlPoints(Graphics2D g2d, Rectangle2D grid, boolean training) {
             g2d.setStroke(new BasicStroke(2));
             for (Sample sample : samples) {
                 double[] inputs = sample.getInputs();
@@ -309,7 +316,7 @@ public class Window extends JFrame {
                 ClassType classType = sample.getClassType();
                 Shape shape = classType.createShape(new Rectangle2D(x, y, width, height));
                 if (training) {
-                    g2d.setColor(Color.WHITE);
+                    g2d.setColor(Color.BLACK);
                     g2d.draw(shape);
                 } else {
                     g2d.setColor(classType.getColor());
@@ -321,9 +328,8 @@ public class Window extends JFrame {
         private void drawTraining(Graphics2D g2d, Rectangle2D grid) {
             for (int x = 0; x < grid.width; x++) {
                 for (int y = 0; y < grid.height; y++) {
-                    double[] inputs = {x, y};
-                    double[][] outputsPerLayers = ffann.feedForward(inputs);
-                    double[] outputs = outputsPerLayers[outputsPerLayers.length - 1];
+                    double[] inputs = {1.0 * x / grid.width, 1.0 * y / grid.height};
+                    double[] outputs = nn.feedForward(inputs);
                     for (int i = 0; i < outputs.length; i++) {
                         if (outputs[i] > 0.5) {
                             outputs[i] = 1;
