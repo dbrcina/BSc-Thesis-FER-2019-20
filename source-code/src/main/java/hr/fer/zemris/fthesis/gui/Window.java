@@ -2,7 +2,7 @@ package hr.fer.zemris.fthesis.gui;
 
 import hr.fer.zemris.fthesis.ann.NeuralNetwork;
 import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.fthesis.ann.afunction.ReLU;
+import hr.fer.zemris.fthesis.ann.afunction.LReLU;
 import hr.fer.zemris.fthesis.ann.afunction.Sigmoid;
 import hr.fer.zemris.fthesis.ann.afunction.Tanh;
 import hr.fer.zemris.fthesis.ann.dataset.Cartesian2DDataset;
@@ -31,13 +31,16 @@ public class Window extends JFrame {
 
     // ----HELPER VARIABLES---- //
     private static final List<Sample> samples = new ArrayList<>();
+    private final List<ActivationFunction> functions = List.of(
+            new Sigmoid(), new LReLU(0.2), new Tanh());
     private static boolean training;
+    private static volatile boolean clear;
     private static NeuralNetwork nn;
     // ------------------------ //
 
     // ----CANVAS COMPONENT---- //
-    private static final int CANVAS_WIDTH = 500;
-    private static final int CANVAS_HEIGHT = 500;
+    private static final int CANVAS_WIDTH = 400;
+    private static final int CANVAS_HEIGHT = 300;
     private JComponent canvas;
     // ------------------------ //
 
@@ -69,6 +72,7 @@ public class Window extends JFrame {
     // ------------------------ //
 
     public Window() {
+        setResizable(false);
         setTitle("ANN classification");
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         initGUI();
@@ -95,7 +99,7 @@ public class Window extends JFrame {
     private void addFirstRow() {
         JPanel panelHiddenLayers = new JPanel();
         lblHiddenLayers = new JLabel("Hidden layers:");
-        fldHiddenLayers = new JTextField("3,3,3", 10);
+        fldHiddenLayers = new JTextField("5,5", 10);
         panelHiddenLayers.add(lblHiddenLayers);
         panelHiddenLayers.add(fldHiddenLayers);
         panelOptions.add(panelHiddenLayers);
@@ -108,7 +112,7 @@ public class Window extends JFrame {
         lblEta = new JLabel("Eta:");
         fldEta = new JTextField("0.1", 5);
         lblErr = new JLabel("MaxError:");
-        fldErr = new JTextField("0.02", 5);
+        fldErr = new JTextField("0.002", 5);
         panelParams.add(lblIter);
         panelParams.add(fldIter);
         panelParams.add(lblEta);
@@ -123,6 +127,7 @@ public class Window extends JFrame {
         lblClassType = new JLabel("Class type:");
         fldClassType = new JTextField(6);
         fldClassType.setEditable(false);
+        fldClassType.setForeground(Color.WHITE);
         fldClassType.getDocument().addDocumentListener(new DocumentListener() {
             public void insertUpdate(DocumentEvent e) {
                 fldClassType.setBackground(currentClassType.getColor());
@@ -145,7 +150,7 @@ public class Window extends JFrame {
         btnGroup = new ButtonGroup();
         btnSigmoid = new JRadioButton("Sigmoid neuron");
         btnSigmoid.setSelected(true);
-        btnReLu = new JRadioButton("ReLu neuron");
+        btnReLu = new JRadioButton("LReLu neuron");
         btnTanh = new JRadioButton("Tanh neuron");
         btnGroup.add(btnSigmoid);
         btnGroup.add(btnReLu);
@@ -178,19 +183,20 @@ public class Window extends JFrame {
     }
 
     private void addActionsToButtons() {
-        btnDeleteLast.addActionListener(evt -> {
-            samples.remove(samples.size() - 1);
-            if (samples.isEmpty()) {
-                btnDeleteLast.setEnabled(false);
-                btnClearAll.setEnabled(false);
-            }
-            canvas.repaint();
-        });
         btnClearAll.addActionListener(evt -> {
             samples.clear();
             btnDeleteLast.setEnabled(false);
             btnClearAll.setEnabled(false);
+            clear = true;
             canvas.repaint();
+        });
+        btnDeleteLast.addActionListener(evt -> {
+            if (samples.size() == 1) {
+                btnClearAll.getActionListeners()[0].actionPerformed(evt);
+            } else {
+                samples.remove(samples.size() - 1);
+                canvas.repaint();
+            }
         });
         btnTrain.addActionListener(evt -> {
             int[] hiddenLayers = Arrays.stream(fldHiddenLayers.getText().split(","))
@@ -213,33 +219,41 @@ public class Window extends JFrame {
                 if (btn.isSelected()) {
                     switch (btn.getText().split("\\s+")[0]) {
                         case "Sigmoid":
-                            activationFunction = new Sigmoid();
+                            activationFunction = functions.get(0);
                             break;
-                        case "ReLu":
-                            activationFunction = new ReLU();
+                        case "LReLu":
+                            activationFunction = functions.get(1);
                             break;
                         case "Tanh":
-                            activationFunction = new Tanh();
+                            activationFunction = functions.get(2);
                             break;
                         default:
                     }
                     break;
                 }
             }
-            List<Sample> list = new ArrayList<>();
+            List<Sample> normalized = new ArrayList<>();
             for (Sample s : samples) {
                 double[] sInputs = s.getInputs();
-                double[] inputs = {sInputs[0] / CANVAS_WIDTH, sInputs[1] / CANVAS_HEIGHT};
-                list.add(new Sample(inputs, s.getOutputs()));
+                double[] inputs = {transformX(sInputs[0]), transformY(sInputs[1])};
+                normalized.add(new Sample(inputs, s.getOutputs()));
             }
-            ReadOnlyDataset dataset = new Cartesian2DDataset(list);
+            ReadOnlyDataset dataset = new Cartesian2DDataset(normalized);
             nn = new NeuralNetwork(layers, activationFunction, dataset);
+            nn.setCanvas(canvas);
+            nn.setRedrawEveryNIter(1000);
             int iterLimit = Integer.parseInt(fldIter.getText());
             double maxError = Double.parseDouble(fldErr.getText());
             double eta = Double.parseDouble(fldEta.getText());
-            nn.train(iterLimit, maxError, eta);
-            training = true;
-            canvas.repaint();
+            btnStop.setEnabled(true);
+            new Thread(() -> {
+                training = true;
+                nn.train(iterLimit, maxError, eta);
+            }).start();
+        });
+        btnStop.addActionListener(evt -> {
+            nn.stop();
+            System.out.println("Stopped");
         });
     }
     // ------------------------------------- //
@@ -277,6 +291,15 @@ public class Window extends JFrame {
         });
         getContentPane().add(canvas);
     }
+
+    private double transformX(double x) {
+        return x / canvas.getSize().getWidth();
+    }
+
+    private double transformY(double y) {
+        return 1.0 * y / canvas.getSize().getHeight();
+    }
+
     // ---------------------------------------- //
 
     /**
@@ -302,19 +325,19 @@ public class Window extends JFrame {
                 drawTraining(g2d, grid);
             }
             drawControlPoints(g2d, grid, training);
-            Window.training = false;
+            //Window.training = false;
         }
 
         private void drawControlPoints(Graphics2D g2d, Rectangle2D grid, boolean training) {
-            g2d.setStroke(new BasicStroke(2));
             for (Sample sample : samples) {
                 double[] inputs = sample.getInputs();
                 int x = (int) inputs[0] - grid.x;
                 int y = (int) inputs[1] - grid.y;
-                int width = 10;
-                int height = 10;
+                int width = 5;
+                int height = 5;
                 ClassType classType = sample.getClassType();
-                Shape shape = classType.createShape(new Rectangle2D(x, y, width, height));
+                Shape shape = classType.createShape(new Rectangle2D(x - width / 2, y - height / 2, width,
+                        height));
                 if (training) {
                     g2d.setColor(Color.BLACK);
                     g2d.draw(shape);
@@ -329,21 +352,10 @@ public class Window extends JFrame {
             for (int x = 0; x < grid.width; x++) {
                 for (int y = 0; y < grid.height; y++) {
                     double[] inputs = {1.0 * x / grid.width, 1.0 * y / grid.height};
-                    double[] outputs = nn.feedForward(inputs);
-                    for (int i = 0; i < outputs.length; i++) {
-                        if (outputs[i] > 0.5) {
-                            outputs[i] = 1;
-                        } else {
-                            outputs[i] = 0;
-                        }
-                    }
-                    ClassType classType = ClassType.fromOutputs(outputs);
-                    if (classType == null) {
-                        g2d.setColor(Color.WHITE);
-                    } else {
-                        g2d.setColor(classType.getColor());
-                    }
-                    g2d.fillRect(x, y, 1, 1);
+                    double[] outputs = Arrays.stream(nn.feedForward(inputs)).map(Math::abs).toArray();
+                    ClassType classType = ClassType.forOutputs(outputs);
+                    g2d.setColor(classType.getColor());
+                    g2d.fillRect(x, y, 2, 2);
                 }
             }
         }

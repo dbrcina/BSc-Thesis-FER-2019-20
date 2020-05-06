@@ -8,6 +8,7 @@ import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
+import javax.swing.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -31,6 +32,22 @@ public class NeuralNetwork {
 
     private final Random rand = new Random();
     private boolean matricesRandomized = false;
+
+    private volatile boolean stop = false;
+    private JComponent canvas;
+    private int redrawEveryNIter = -1;
+
+    public void setCanvas(JComponent canvas) {
+        this.canvas = canvas;
+    }
+
+    public void setRedrawEveryNIter(int redrawEveryNIter) {
+        this.redrawEveryNIter = redrawEveryNIter;
+    }
+
+    public void stop() {
+        stop = true;
+    }
 
     public NeuralNetwork(int[] layers, ActivationFunction function, ReadOnlyDataset dataset) {
         this.layers = layers;
@@ -104,14 +121,25 @@ public class NeuralNetwork {
     }
 
     public void train(int iterLimit, double maxError, double eta) {
+        stop = false;
         // randomize weights and biases
         randomizeMatrices();
         int numberOfSamples = dataset.numberOfSamples();
         // start iterations
-        for (int iter = 0; iter < iterLimit; iter++) {
+        for (int iter = 0; iter < iterLimit && !stop; iter++) {
+            if (canvas != null) {
+                if ((iter + 1) % redrawEveryNIter == 0) {
+                    SwingUtilities.invokeLater(() -> canvas.repaint());
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
             double error = 0.0;
             // for every sample
-            for (int i = 0; i < numberOfSamples; i++) {
+            for (int i = 0; i < numberOfSamples && !stop; i++) {
                 Sample sample = dataset.getSample(i);
                 // feed forward sample
                 double[] predictedOutputs = feedForward(sample.getInputs());
@@ -188,45 +216,6 @@ public class NeuralNetwork {
                 biasesPerLayerK.setEntry(row, 0, bias);
             }
         }
-    }
-
-    public void statistics() {
-        int numberOfSamples = dataset.numberOfSamples();
-        int goodCounter = 0;
-        int badCounter = 0;
-        List<String> badInputs = new ArrayList<>();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < numberOfSamples; i++) {
-            Sample sample = dataset.getSample(i);
-            double[] inputs = sample.getInputs();
-            double[] expectedOutputs = sample.getOutputs();
-            double[] actualOutputs = feedForward(inputs);
-            for (int j = 0; j < actualOutputs.length; j++) {
-                actualOutputs[j] = actualOutputs[j] < 0.5 ? 0.0 : 1.0;
-            }
-            if (Arrays.equals(expectedOutputs, actualOutputs)) goodCounter++;
-            else {
-                badCounter++;
-                sb.append("Ulazi:").append(Arrays.toString(inputs));
-                sb.append("\n");
-                sb.append("Očekivani izlazi:").append(Arrays.toString(expectedOutputs));
-                sb.append("\n");
-                sb.append("Dobiveni izlazi: ").append(Arrays.toString(actualOutputs));
-                sb.append("\n");
-                badInputs.add(sb.toString());
-                sb.setLength(0);
-            }
-
-        }
-        sb.append("\n");
-        sb.append("Dobri izlazi:").append(goodCounter);
-        sb.append("\n");
-        sb.append("Loši izlazi: ").append(badCounter);
-        sb.append("\n");
-        System.out.println(sb.toString());
-
-        System.out.println("Krivi rezultati za ulaze:");
-        badInputs.forEach(System.out::println);
     }
 
 }

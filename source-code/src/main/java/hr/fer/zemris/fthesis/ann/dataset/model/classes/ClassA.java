@@ -9,7 +9,7 @@ public class ClassA extends ClassType {
     public static final double[] OUTPUTS = {1, 0, 0};
 
     public ClassA() {
-        super(OUTPUTS, new Color(255, 102, 102));
+        super(OUTPUTS, Color.RED);
     }
 
     @Override

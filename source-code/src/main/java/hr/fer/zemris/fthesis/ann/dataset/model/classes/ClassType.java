@@ -11,13 +11,11 @@ import java.util.Arrays;
  *     <li>desired outputs,</li>
  *     <li>color.</li>
  * </ul>
- * Every class is represented by unique shape which can be obtained by
- * {@link #createShape(Rectangle2D)} method.
  */
 public abstract class ClassType {
 
     private final double[] outputs;
-    private final Color color;
+    private Color color;
 
     protected ClassType(double[] outputs, Color color) {
         this.outputs = outputs;
@@ -32,6 +30,16 @@ public abstract class ClassType {
         return color;
     }
 
+    private void darkenColorFor(double[] outputs) {
+        int r = (int) (outputs[0] * 255);
+        int g = (int) (outputs[1] * 255);
+        int b = (int) (outputs[2] * 255);
+        if (r > 255) r = 255;
+        if (g > 255) g = 255;
+        if (b > 255) b = 255;
+        color = new Color(r, g, b);
+    }
+
     /**
      * Creates a shape based on provided rectangle.
      *
@@ -40,18 +48,31 @@ public abstract class ClassType {
      */
     public abstract Shape createShape(Rectangle2D rect);
 
+    @Override
     public abstract String toString();
 
-    public static ClassType fromOutputs(double[] outputs) {
-        if (Arrays.equals(outputs, ClassA.OUTPUTS)) {
-            return new ClassA();
-        } else if (Arrays.equals(outputs, ClassB.OUTPUTS)) {
-            return new ClassB();
-        } else if (Arrays.equals(outputs, ClassC.OUTPUTS)) {
-            return new ClassC();
+    /**
+     * Determines class type for given <i>outputs</i>.
+     *
+     * @param outputs outputs.
+     * @return class type.
+     */
+    public static ClassType forOutputs(double[] outputs) {
+        double[] modified = Arrays.stream(outputs)
+                .map(d -> d = d < 0.5 ? 0 : 1)
+                .toArray();
+        ClassType classType;
+        if (Arrays.equals(modified, ClassA.OUTPUTS)) {
+            classType = new ClassA();
+        } else if (Arrays.equals(modified, ClassB.OUTPUTS)) {
+            classType = new ClassB();
+        } else if (Arrays.equals(modified, ClassC.OUTPUTS)) {
+            classType = new ClassC();
         } else {
-            return null;
+            classType = new ClassNone();
         }
+        classType.darkenColorFor(outputs);
+        return classType;
     }
 
 }
