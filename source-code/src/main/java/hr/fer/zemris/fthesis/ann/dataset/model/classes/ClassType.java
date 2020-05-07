@@ -34,9 +34,6 @@ public abstract class ClassType {
         int r = (int) (outputs[0] * 255);
         int g = (int) (outputs[1] * 255);
         int b = (int) (outputs[2] * 255);
-        if (r > 255) r = 255;
-        if (g > 255) g = 255;
-        if (b > 255) b = 255;
         color = new Color(r, g, b);
     }
 

@@ -36,4 +36,9 @@ public class Cartesian2DDataset implements ReadOnlyDataset {
         throw new RuntimeException("This method is currently not supported.");
     }
 
+    @Override
+    public List<Sample> samples() {
+        return samples;
+    }
+
 }

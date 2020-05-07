@@ -2,7 +2,7 @@ package hr.fer.zemris.fthesis.gui;
 
 import hr.fer.zemris.fthesis.ann.NeuralNetwork;
 import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.fthesis.ann.afunction.LReLU;
+import hr.fer.zemris.fthesis.ann.afunction.ReLU;
 import hr.fer.zemris.fthesis.ann.afunction.Sigmoid;
 import hr.fer.zemris.fthesis.ann.afunction.Tanh;
 import hr.fer.zemris.fthesis.ann.dataset.Cartesian2DDataset;
@@ -32,7 +32,7 @@ public class Window extends JFrame {
     // ----HELPER VARIABLES---- //
     private static final List<Sample> samples = new ArrayList<>();
     private final List<ActivationFunction> functions = List.of(
-            new Sigmoid(), new LReLU(0.2), new Tanh());
+            new Sigmoid(), new ReLU(), new Tanh());
     private static boolean training;
     private static volatile boolean clear;
     private static NeuralNetwork nn;
@@ -48,14 +48,14 @@ public class Window extends JFrame {
     private JPanel panelOptions;
     private JLabel lblHiddenLayers;
     private JTextField fldHiddenLayers;
-    private JLabel lblClassType;
-    private JTextField fldClassType;
     private JLabel lblEta;
     private JTextField fldEta;
     private JLabel lblIter;
     private JTextField fldIter;
     private JLabel lblErr;
     private JTextField fldErr;
+    private JLabel lblClassType;
+    private JTextField fldClassType;
     private ButtonGroup btnGroup;
     private JRadioButton btnSigmoid;
     private JRadioButton btnReLu;
@@ -71,6 +71,7 @@ public class Window extends JFrame {
     private ClassType currentClassType = classTypes.get(0);
     // ------------------------ //
 
+    // ---- CONSTRUCTOR ---- //
     public Window() {
         setResizable(false);
         setTitle("ANN classification");
@@ -79,6 +80,7 @@ public class Window extends JFrame {
         pack();
         setLocationRelativeTo(null);
     }
+    // --------------------- //
 
     private void initGUI() {
         initPanelOptions();
@@ -150,7 +152,7 @@ public class Window extends JFrame {
         btnGroup = new ButtonGroup();
         btnSigmoid = new JRadioButton("Sigmoid neuron");
         btnSigmoid.setSelected(true);
-        btnReLu = new JRadioButton("LReLu neuron");
+        btnReLu = new JRadioButton("ReLu neuron");
         btnTanh = new JRadioButton("Tanh neuron");
         btnGroup.add(btnSigmoid);
         btnGroup.add(btnReLu);
@@ -221,7 +223,7 @@ public class Window extends JFrame {
                         case "Sigmoid":
                             activationFunction = functions.get(0);
                             break;
-                        case "LReLu":
+                        case "ReLu":
                             activationFunction = functions.get(1);
                             break;
                         case "Tanh":
@@ -249,6 +251,7 @@ public class Window extends JFrame {
             new Thread(() -> {
                 training = true;
                 nn.train(iterLimit, maxError, eta);
+                canvas.repaint();
             }).start();
         });
         btnStop.addActionListener(evt -> {
@@ -291,6 +294,7 @@ public class Window extends JFrame {
         });
         getContentPane().add(canvas);
     }
+    // ---------------------------------------- //
 
     private double transformX(double x) {
         return x / canvas.getSize().getWidth();
@@ -352,7 +356,7 @@ public class Window extends JFrame {
             for (int x = 0; x < grid.width; x++) {
                 for (int y = 0; y < grid.height; y++) {
                     double[] inputs = {1.0 * x / grid.width, 1.0 * y / grid.height};
-                    double[] outputs = Arrays.stream(nn.feedForward(inputs)).map(Math::abs).toArray();
+                    double[] outputs = nn.feedForward(inputs);
                     ClassType classType = ClassType.forOutputs(outputs);
                     g2d.setColor(classType.getColor());
                     g2d.fillRect(x, y, 2, 2);

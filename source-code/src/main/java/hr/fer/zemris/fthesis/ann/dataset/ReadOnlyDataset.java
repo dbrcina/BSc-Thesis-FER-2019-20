@@ -3,6 +3,7 @@ package hr.fer.zemris.fthesis.ann.dataset;
 import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
 
 import java.nio.file.Path;
+import java.util.List;
 
 /**
  * Interface which provides some generic methods for working with datasets.
@@ -28,5 +29,7 @@ public interface ReadOnlyDataset {
      * @throws IndexOutOfBoundsException if provided <i>i</i> is invalid.
      */
     Sample getSample(int i);
+
+    List<Sample> samples();
 
 }

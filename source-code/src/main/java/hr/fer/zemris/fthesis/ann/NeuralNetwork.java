@@ -1,6 +1,7 @@
 package hr.fer.zemris.fthesis.ann;
 
 import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
+import hr.fer.zemris.fthesis.ann.afunction.Sigmoid;
 import hr.fer.zemris.fthesis.ann.dataset.ReadOnlyDataset;
 import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
 import org.apache.commons.math3.linear.ArrayRealVector;
@@ -9,10 +10,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
 import javax.swing.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 /**
  * Feed forward neural network <i>(Multilayer perceptron)</i> that uses <b>Backpropagation algorithm</b>
@@ -20,6 +18,16 @@ import java.util.Random;
  */
 public class NeuralNetwork {
 
+    public enum LearningType {
+        ONLINE,
+        BATCH,
+        MINI_BATCH
+    }
+
+    private LearningType learningType = LearningType.BATCH;
+    private int batchSize = 2;
+
+    private final ActivationFunction sigmoid = new Sigmoid();
     private final int[] layers;
     private final ActivationFunction function;
     private final ReadOnlyDataset dataset;
@@ -110,12 +118,19 @@ public class NeuralNetwork {
             // calculate weighted sums
             RealMatrix outputsLayerK1 = (weightsLayerK.multiply(outputsLayerK)).add(biasesLayerK);
             double[] weightedSums = outputsLayerK1.getColumn(0);
-            // apply activation function
-            outputsPerLayer.get(k + 1).setColumn(
-                    0, Arrays.stream(weightedSums).map(function::valueAt).toArray());
-            // apply derivative activation function
-            derivativesPerLayer.get(k).setColumn(
-                    0, Arrays.stream(weightedSums).map(function::derivativeValueAt).toArray());
+            if (k != weightsPerLayer.size() - 1) {
+                // apply activation function to hidden layers
+                outputsPerLayer.get(k + 1).setColumn(
+                        0, Arrays.stream(weightedSums).map(function::valueAt).toArray());
+                derivativesPerLayer.get(k).setColumn(
+                        0, Arrays.stream(weightedSums).map(function::derivativeValueAt).toArray());
+            } else {
+                // apply sigmoid to outputs
+                outputsPerLayer.get(k + 1).setColumn(
+                        0, Arrays.stream(weightedSums).map(sigmoid::valueAt).toArray());
+                derivativesPerLayer.get(k).setColumn(
+                        0, Arrays.stream(weightedSums).map(sigmoid::derivativeValueAt).toArray());
+            }
         }
         return outputsPerLayer.get(outputsPerLayer.size() - 1).getColumn(0);
     }
@@ -124,6 +139,8 @@ public class NeuralNetwork {
         stop = false;
         // randomize weights and biases
         randomizeMatrices();
+        Collection<Collection<Sample>> samplesCollection = prepareSamples();
+        System.out.println(samplesCollection.size());
         int numberOfSamples = dataset.numberOfSamples();
         // start iterations
         for (int iter = 0; iter < iterLimit && !stop; iter++) {
@@ -138,6 +155,34 @@ public class NeuralNetwork {
                 }
             }
             double error = 0.0;
+            for (Collection<Sample> samplesC : samplesCollection) {
+                if (stop) break;
+                // for every sample
+                for (Sample sample : samplesC) {
+                    if (stop) break;
+                    // feed forward sample
+                    double[] predictedOutputs = feedForward(sample.getInputs());
+                    double[] expectedOutputs = sample.getOutputs();
+                    // accumulate error
+                    for (int j = 0; j < expectedOutputs.length; j++) {
+                        double subtract = expectedOutputs[j] - predictedOutputs[j];
+                        error += subtract * subtract;
+                    }
+                    calculateDeltasPerLayer(expectedOutputs);
+                    updateWeightsBiases(eta);
+                }
+            }
+            // check accumulated error and print results
+            error = error / (2 * numberOfSamples);
+            boolean exit = error < maxError;
+            if (iter == 0 || exit || (iter + 1) % 1000 == 0) {
+                System.out.println("Iter " + (iter + 1) + "., error = " + error);
+                if (exit) {
+                    System.out.println("Found closest error! Exiting...");
+                    break;
+                }
+            }
+            /*double error = 0.0;
             // for every sample
             for (int i = 0; i < numberOfSamples && !stop; i++) {
                 Sample sample = dataset.getSample(i);
@@ -161,8 +206,37 @@ public class NeuralNetwork {
                     System.out.println("Found closest error! Exiting...");
                     break;
                 }
+            }*/
+        }
+    }
+
+    private Collection<Collection<Sample>> prepareSamples() {
+        Collection<Collection<Sample>> samplesCollection = new LinkedList<>();
+        List<Sample> samples = dataset.samples();
+        if (learningType == LearningType.BATCH) {
+            samplesCollection.add(samples);
+        } else if (learningType == LearningType.ONLINE) {
+            samples.forEach(s -> samplesCollection.add(List.of(s)));
+        } else {
+            int numberOfBatches = samples.size() / batchSize;
+            int offset = 0;
+            for (int batch = 0; batch < numberOfBatches; batch++) {
+                List<Sample> batchSamples = new ArrayList<>();
+                do {
+                    batchSamples.add(samples.get(offset++));
+                } while (offset % batchSize != 0);
+                samplesCollection.add(batchSamples);
+            }
+            int numOfLeftSamples = samples.size() % batchSize;
+            if (numOfLeftSamples != 0) {
+                List<Sample> leftSamples = new ArrayList<>();
+                for (int i = offset; i < samples.size(); i++) {
+                    leftSamples.add(samples.get(i));
+                }
+                samplesCollection.add(leftSamples);
             }
         }
+        return samplesCollection;
     }
 
     private void calculateDeltasPerLayer(double[] expectedOutputs) {
