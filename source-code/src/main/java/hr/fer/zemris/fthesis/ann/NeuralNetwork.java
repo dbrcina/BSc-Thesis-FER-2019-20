@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 /**
  * Feed forward neural network <i>(Multilayer perceptron)</i> that uses <b>Backpropagation</b> as a
- * method for finding derivatives and <b>Gradient descent</b> as a learning algorithm.
+ * learning algorithm.
  */
 public class NeuralNetwork {
 
@@ -57,8 +57,8 @@ public class NeuralNetwork {
     private RealMatrix[] outputsPerLayer;
     private RealMatrix[] derivativesPerLayer;
     private RealMatrix[] deltasPerLayer;
-    private RealMatrix[] updatesWeightsPerLayer;
-    private RealMatrix[] updatesBiasesPerLayer;
+    private RealMatrix[] weightsUpdatesPerLayer;
+    private RealMatrix[] biasesUpdatesPerLayer;
     /* ------------------------------------- */
 
     /* HELPER VARIABLES */
@@ -120,16 +120,16 @@ public class NeuralNetwork {
         outputsPerLayer = new RealMatrix[layers.length];
         derivativesPerLayer = new RealMatrix[layers.length - 1];
         deltasPerLayer = new RealMatrix[layers.length - 1];
-        updatesWeightsPerLayer = new RealMatrix[layers.length - 1];
-        updatesBiasesPerLayer = new RealMatrix[layers.length - 1];
+        weightsUpdatesPerLayer = new RealMatrix[layers.length - 1];
+        biasesUpdatesPerLayer = new RealMatrix[layers.length - 1];
         for (int k = 0; k < layers.length; k++) {
             if (k != layers.length - 1) {
                 weightsPerLayer[k] = MatrixUtils.createRealMatrix(layers[k + 1], layers[k]);
                 biasesPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
                 derivativesPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
                 deltasPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
-                updatesWeightsPerLayer[k] = MatrixUtils.createRealMatrix(layers[k + 1], layers[k]);
-                updatesBiasesPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
+                weightsUpdatesPerLayer[k] = MatrixUtils.createRealMatrix(layers[k + 1], layers[k]);
+                biasesUpdatesPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
             }
             outputsPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k]]);
         }
@@ -245,9 +245,9 @@ public class NeuralNetwork {
                 }
                 // apply updates for weights and biases
                 System.arraycopy(
-                        updatesWeightsPerLayer, 0, weightsPerLayer, 0, updatesWeightsPerLayer.length);
+                        weightsUpdatesPerLayer, 0, weightsPerLayer, 0, weightsUpdatesPerLayer.length);
                 System.arraycopy(
-                        updatesBiasesPerLayer, 0, biasesPerLayer, 0, updatesBiasesPerLayer.length);
+                        biasesUpdatesPerLayer, 0, biasesPerLayer, 0, biasesUpdatesPerLayer.length);
             }
             /* ---------------------- */
 
@@ -302,12 +302,14 @@ public class NeuralNetwork {
     }
     /* -------------------------------------------------- */
 
+    /* RESETS UPDATE MATRICES */
     private void resetUpdates() {
-        for (int k = 0; k < updatesWeightsPerLayer.length; k++) {
-            updatesWeightsPerLayer[k] = weightsPerLayer[k].copy();
-            updatesBiasesPerLayer[k] = biasesPerLayer[k].copy();
+        for (int k = 0; k < weightsUpdatesPerLayer.length; k++) {
+            weightsUpdatesPerLayer[k] = weightsPerLayer[k].copy();
+            biasesUpdatesPerLayer[k] = biasesPerLayer[k].copy();
         }
     }
+    /* ---------------------- */
 
     /* CALCULATE DELTAS - BACKPROPAGATION ALGORITHM */
     private void calculateDeltasPerLayer(double[] expectedOutputs) {
@@ -347,9 +349,9 @@ public class NeuralNetwork {
 
     /* UPDATE WEIGHTS AND BIASES AFTER ONE SAMPLE */
     private void updateWeightsBiases(double eta) {
-        for (int k = 0; k < updatesWeightsPerLayer.length; k++) {
-            RealMatrix updatesWeightsLayerK = updatesWeightsPerLayer[k];
-            RealMatrix updatesBiasesLayerK = updatesBiasesPerLayer[k];
+        for (int k = 0; k < weightsUpdatesPerLayer.length; k++) {
+            RealMatrix updatesWeightsLayerK = weightsUpdatesPerLayer[k];
+            RealMatrix updatesBiasesLayerK = biasesUpdatesPerLayer[k];
             RealVector outputsLayerK = outputsPerLayer[k].getColumnVector(0);
             RealVector deltasLayerK1 = deltasPerLayer[k].getColumnVector(0);
             for (int i = 0; i < updatesWeightsLayerK.getRowDimension(); i++) {
