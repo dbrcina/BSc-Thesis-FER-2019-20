@@ -1,7 +1,6 @@
 package hr.fer.zemris.fthesis.ann;
 
 import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.fthesis.ann.afunction.Sigmoid;
 import hr.fer.zemris.fthesis.ann.dataset.ReadOnlyDataset;
 import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
 import org.apache.commons.math3.linear.ArrayRealVector;
@@ -11,88 +10,149 @@ import org.apache.commons.math3.linear.RealVector;
 
 import javax.swing.*;
 import java.util.*;
+import java.util.function.Function;
 
 /**
- * Feed forward neural network <i>(Multilayer perceptron)</i> that uses <b>Backpropagation algorithm</b>
- * as learning algorithm.
+ * Feed forward neural network <i>(Multilayer perceptron)</i> that uses <b>Backpropagation</b> as a
+ * method for finding derivatives and <b>Gradient descent</b> as a learning algorithm.
  */
 public class NeuralNetwork {
 
+    /**
+     * Enum that models learning types of backpropagation algorithm. Valid types are:
+     * <ul>
+     *     <li>ONLINE -- Stochastic Gradient Descent</li>
+     *     <li>BATCH -- Batch Gradient Descent</li>
+     *     <li>MINI_BATCH -- Mini-Batch Gradient Descent.</li>
+     * </ul>
+     */
     public enum LearningType {
-        ONLINE,
-        BATCH,
-        MINI_BATCH
-    }
+        ONLINE("Stochastic"),
+        BATCH("Batch"),
+        MINI_BATCH("Mini-Batch");
 
-    private LearningType learningType = LearningType.BATCH;
-    private int batchSize = 2;
+        private final String type;
 
-    private final ActivationFunction sigmoid = new Sigmoid();
-    private final int[] layers;
-    private final ActivationFunction function;
-    private final ReadOnlyDataset dataset;
+        LearningType(String type) {
+            this.type = type;
+        }
 
-    private final List<RealMatrix> weightsPerLayer = new ArrayList<>();
-    private final List<RealMatrix> biasesPerLayer = new ArrayList<>();
-    private final List<RealMatrix> outputsPerLayer = new ArrayList<>();
-    private final List<RealMatrix> derivativesPerLayer = new ArrayList<>();
-    private final List<RealMatrix> deltasPerLayer = new ArrayList<>();
-
-    private final Random rand = new Random();
-    private boolean matricesRandomized = false;
-
-    private volatile boolean stop = false;
-    private JComponent canvas;
-    private int redrawEveryNIter = -1;
-
-    public void setCanvas(JComponent canvas) {
-        this.canvas = canvas;
-    }
-
-    public void setRedrawEveryNIter(int redrawEveryNIter) {
-        this.redrawEveryNIter = redrawEveryNIter;
-    }
-
-    public void stop() {
-        stop = true;
-    }
-
-    public NeuralNetwork(int[] layers, ActivationFunction function, ReadOnlyDataset dataset) {
-        this.layers = layers;
-        this.function = function;
-        this.dataset = dataset;
-        setupMatrices();
-    }
-
-    // allocates memory for matrices
-    private void setupMatrices() {
-        for (int k = 0; k < layers.length; k++) {
-            if (k != layers.length - 1) {
-                weightsPerLayer.add(MatrixUtils.createRealMatrix(layers[k + 1], layers[k]));
-                biasesPerLayer.add(MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]));
-                derivativesPerLayer.add(MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]));
-                deltasPerLayer.add(MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]));
-            }
-            outputsPerLayer.add(MatrixUtils.createColumnRealMatrix(new double[layers[k]]));
+        @Override
+        public String toString() {
+            return type;
         }
     }
 
-    // randomize between [-1, 1]
+    /* GENERAL PARAMETERS FOR NETWORK */
+    private int[] layers;
+    private ActivationFunction aFunction;
+    private ReadOnlyDataset dataset;
+    private LearningType learningType = LearningType.ONLINE;
+    private int batchSize = 5;
+    /* ------------------------------ */
+
+    /* ALL MATRICES USED IN TRAINING PROCESS */
+    private RealMatrix[] weightsPerLayer;
+    private RealMatrix[] biasesPerLayer;
+    private RealMatrix[] outputsPerLayer;
+    private RealMatrix[] derivativesPerLayer;
+    private RealMatrix[] deltasPerLayer;
+    private RealMatrix[] updatesWeightsPerLayer;
+    private RealMatrix[] updatesBiasesPerLayer;
+    /* ------------------------------------- */
+
+    /* HELPER VARIABLES */
+    private final Random rand = new Random();
+    private boolean matricesRandomized;
+    /* ---------------- */
+
+    /* CONSTRUCTOR */
+    public NeuralNetwork() {
+    }
+
+    public NeuralNetwork(int[] layers, ActivationFunction aFunction, ReadOnlyDataset dataset) {
+        this.layers = layers;
+        this.aFunction = aFunction;
+        this.dataset = dataset;
+        setupMatrices();
+    }
+    /* ----------- */
+
+    /* SETTERS FOR GENERAL PARAMETERS */
+    public void setLayers(int[] layers) {
+        this.layers = layers;
+        setupMatrices();
+    }
+
+    public void setAFunction(ActivationFunction aFunction) {
+        this.aFunction = aFunction;
+    }
+
+    public void setDataset(ReadOnlyDataset dataset) {
+        this.dataset = dataset;
+    }
+
+    /**
+     * Setter for learning type. Default value is {@link LearningType#ONLINE}.
+     *
+     * @param learningType learning type.
+     */
+    public void setLearningType(LearningType learningType) {
+        this.learningType = learningType;
+    }
+
+    /**
+     * Setter for batch size. Provided {@code batchSize} will be used only if learning type is set to
+     * {@link LearningType#MINI_BATCH}. Default value is 5.
+     *
+     * @param batchSize batch size.
+     */
+    public void setBatchSize(int batchSize) {
+        this.batchSize = batchSize;
+    }
+    /* -------------------------------- */
+
+    /* MEMORY ALLOCATION FOR MATRICES */
+    private void setupMatrices() {
+        matricesRandomized = false;
+        weightsPerLayer = new RealMatrix[layers.length - 1];
+        biasesPerLayer = new RealMatrix[layers.length - 1];
+        outputsPerLayer = new RealMatrix[layers.length];
+        derivativesPerLayer = new RealMatrix[layers.length - 1];
+        deltasPerLayer = new RealMatrix[layers.length - 1];
+        updatesWeightsPerLayer = new RealMatrix[layers.length - 1];
+        updatesBiasesPerLayer = new RealMatrix[layers.length - 1];
+        for (int k = 0; k < layers.length; k++) {
+            if (k != layers.length - 1) {
+                weightsPerLayer[k] = MatrixUtils.createRealMatrix(layers[k + 1], layers[k]);
+                biasesPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
+                derivativesPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
+                deltasPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
+                updatesWeightsPerLayer[k] = MatrixUtils.createRealMatrix(layers[k + 1], layers[k]);
+                updatesBiasesPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k + 1]]);
+            }
+            outputsPerLayer[k] = MatrixUtils.createColumnRealMatrix(new double[layers[k]]);
+        }
+    }
+    /* ------------------------------- */
+
+    /* RANDOM INITIALIZATION BETWEEN [-1,1] */
     private void randomizeMatrices() {
         if (!matricesRandomized) {
             matricesRandomized = true;
         }
-        for (int k = 0; k < weightsPerLayer.size(); k++) {
-            RealMatrix weightsLayerK = weightsPerLayer.get(k);
-            RealMatrix biasesLayerK = biasesPerLayer.get(k);
-            for (int row = 0; row < weightsLayerK.getRowDimension(); row++) {
-                for (int column = 0; column < weightsLayerK.getColumnDimension(); column++) {
-                    weightsLayerK.setEntry(row, column, rand.nextDouble() * 2 - 1);
+        for (int k = 0; k < weightsPerLayer.length; k++) {
+            RealMatrix weightsLayerK = weightsPerLayer[k];
+            RealMatrix biasesLayerK = biasesPerLayer[k];
+            for (int i = 0; i < weightsLayerK.getRowDimension(); i++) {
+                for (int j = 0; j < weightsLayerK.getColumnDimension(); j++) {
+                    weightsLayerK.setEntry(i, j, rand.nextDouble() * 2 - 1);
                 }
-                biasesLayerK.setEntry(row, 0, rand.nextDouble() - 0.5);
+                biasesLayerK.setEntry(i, 0, rand.nextDouble() * 2 - 1);
             }
         }
     }
+    /* ------------------------------------ */
 
     /**
      * Feed forwards provided <i>inputs</i> and returns outputs as an array.
@@ -110,155 +170,166 @@ public class NeuralNetwork {
         if (!matricesRandomized) {
             randomizeMatrices();
         }
-        outputsPerLayer.get(0).setColumn(0, inputs);
-        for (int k = 0; k < weightsPerLayer.size(); k++) {
-            RealMatrix weightsLayerK = weightsPerLayer.get(k);
-            RealMatrix biasesLayerK = biasesPerLayer.get(k);
-            RealMatrix outputsLayerK = outputsPerLayer.get(k);
-            // calculate weighted sums
+        outputsPerLayer[0].setColumn(0, inputs);
+        for (int k = 0; k < weightsPerLayer.length; k++) {
+            RealMatrix weightsLayerK = weightsPerLayer[k];
+            RealMatrix biasesLayerK = biasesPerLayer[k];
+            RealMatrix outputsLayerK = outputsPerLayer[k];
             RealMatrix outputsLayerK1 = (weightsLayerK.multiply(outputsLayerK)).add(biasesLayerK);
             double[] weightedSums = outputsLayerK1.getColumn(0);
-            if (k != weightsPerLayer.size() - 1) {
+            if (k != weightsPerLayer.length - 1) {
                 // apply activation function to hidden layers
-                outputsPerLayer.get(k + 1).setColumn(
-                        0, Arrays.stream(weightedSums).map(function::valueAt).toArray());
-                derivativesPerLayer.get(k).setColumn(
-                        0, Arrays.stream(weightedSums).map(function::derivativeValueAt).toArray());
+                outputsPerLayer[k + 1].setColumn(
+                        0, Arrays.stream(weightedSums).map(aFunction::valueAt).toArray());
+                derivativesPerLayer[k].setColumn(
+                        0, Arrays.stream(weightedSums).map(aFunction::derivativeValueAt).toArray());
             } else {
-                // apply sigmoid to outputs
-                outputsPerLayer.get(k + 1).setColumn(
-                        0, Arrays.stream(weightedSums).map(sigmoid::valueAt).toArray());
-                derivativesPerLayer.get(k).setColumn(
-                        0, Arrays.stream(weightedSums).map(sigmoid::derivativeValueAt).toArray());
+                // apply softmax to outputs
+                outputsPerLayer[k + 1].setColumn(0, SOFTMAX.apply(weightedSums));
+                derivativesPerLayer[k].setColumn(0, SOFTMAX_DERIVATIVE.apply(weightedSums));
             }
         }
-        return outputsPerLayer.get(outputsPerLayer.size() - 1).getColumn(0);
+        return outputsPerLayer[outputsPerLayer.length - 1].getColumn(0);
     }
 
-    public void train(int iterLimit, double maxError, double eta) {
+    public void train(int epochs, double maxError, double eta) {
         stop = false;
+        System.out.println("Starting " + learningType + " backpropagation.");
+
         // randomize weights and biases
         randomizeMatrices();
-        Collection<Collection<Sample>> samplesCollection = prepareSamples();
-        System.out.println(samplesCollection.size());
+
+        // prepare batches based on learning type
+        Collection<Collection<Sample>> batches = prepareBatches();
         int numberOfSamples = dataset.numberOfSamples();
-        // start iterations
-        for (int iter = 0; iter < iterLimit && !stop; iter++) {
+
+        // start epochs
+        for (int epoch = 0; epoch < epochs && !stop; epoch++) {
+
+            /* next part is used for continuous updates on GUI */
             if (canvas != null) {
-                if ((iter + 1) % redrawEveryNIter == 0) {
+                if ((epoch + 1) % redrawEveryNEpoch == 0) {
                     SwingUtilities.invokeLater(() -> canvas.repaint());
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        System.out.println("Error occurred while tread was sleeping...");
                     }
                 }
             }
+            /* ----------------------------------------------- */
+
+            // variable for accumulating the error
             double error = 0.0;
-            for (Collection<Sample> samplesC : samplesCollection) {
+
+            /* go through every batch */
+            for (Collection<Sample> batch : batches) {
                 if (stop) break;
+                // reset updates matrices
+                resetUpdates();
                 // for every sample
-                for (Sample sample : samplesC) {
+                for (Sample sample : batch) {
                     if (stop) break;
                     // feed forward sample
                     double[] predictedOutputs = feedForward(sample.getInputs());
                     double[] expectedOutputs = sample.getOutputs();
                     // accumulate error
-                    for (int j = 0; j < expectedOutputs.length; j++) {
-                        double subtract = expectedOutputs[j] - predictedOutputs[j];
+                    for (int i = 0; i < expectedOutputs.length; i++) {
+                        double subtract = expectedOutputs[i] - predictedOutputs[i];
                         error += subtract * subtract;
                     }
+                    // calculate all deltas using backpropagation
                     calculateDeltasPerLayer(expectedOutputs);
+                    // update weights and biases and save to memory
                     updateWeightsBiases(eta);
                 }
+                // apply updates for weights and biases
+                System.arraycopy(
+                        updatesWeightsPerLayer, 0, weightsPerLayer, 0, updatesWeightsPerLayer.length);
+                System.arraycopy(
+                        updatesBiasesPerLayer, 0, biasesPerLayer, 0, updatesBiasesPerLayer.length);
             }
-            // check accumulated error and print results
+            /* ---------------------- */
+
+            /* check accumulated error and print results */
+            if (stop) break;
             error = error / (2 * numberOfSamples);
             boolean exit = error < maxError;
-            if (iter == 0 || exit || (iter + 1) % 1000 == 0) {
-                System.out.println("Iter " + (iter + 1) + "., error = " + error);
+            if (epoch == 0 || exit || (epoch + 1) % 1000 == 0) {
+                System.out.println("Epoch " + (epoch + 1) + "., error = " + error);
                 if (exit) {
                     System.out.println("Found closest error! Exiting...");
                     break;
                 }
             }
-            /*double error = 0.0;
-            // for every sample
-            for (int i = 0; i < numberOfSamples && !stop; i++) {
-                Sample sample = dataset.getSample(i);
-                // feed forward sample
-                double[] predictedOutputs = feedForward(sample.getInputs());
-                double[] expectedOutputs = sample.getOutputs();
-                // accumulate error
-                for (int j = 0; j < expectedOutputs.length; j++) {
-                    double subtract = expectedOutputs[j] - predictedOutputs[j];
-                    error += subtract * subtract;
-                }
-                calculateDeltasPerLayer(expectedOutputs);
-                updateWeightsBiases(eta);
-            }
-            // check accumulated error and print results
-            error = error / (2 * numberOfSamples);
-            boolean exit = error < maxError;
-            if (iter == 0 || exit || (iter + 1) % 1000 == 0) {
-                System.out.println("Iter " + (iter + 1) + "., error = " + error);
-                if (exit) {
-                    System.out.println("Found closest error! Exiting...");
-                    break;
-                }
-            }*/
+            /* ----------------------------------------- */
+        }
+
+        if (stop) {
+            System.out.println("Stopped.");
         }
     }
 
-    private Collection<Collection<Sample>> prepareSamples() {
-        Collection<Collection<Sample>> samplesCollection = new LinkedList<>();
+    /* PREPARE BATCHES OF SAMPLES BASED ON LEARNING TYPE */
+    private Collection<Collection<Sample>> prepareBatches() {
+        Collection<Collection<Sample>> batches = new LinkedList<>();
         List<Sample> samples = dataset.samples();
+        Collections.shuffle(samples);
         if (learningType == LearningType.BATCH) {
-            samplesCollection.add(samples);
+            batches.add(samples);
         } else if (learningType == LearningType.ONLINE) {
-            samples.forEach(s -> samplesCollection.add(List.of(s)));
+            samples.forEach(s -> batches.add(List.of(s)));
         } else {
             int numberOfBatches = samples.size() / batchSize;
             int offset = 0;
-            for (int batch = 0; batch < numberOfBatches; batch++) {
-                List<Sample> batchSamples = new ArrayList<>();
+            for (int i = 0; i < numberOfBatches; i++) {
+                List<Sample> batch = new LinkedList<>();
                 do {
-                    batchSamples.add(samples.get(offset++));
+                    batch.add(samples.get(offset++));
                 } while (offset % batchSize != 0);
-                samplesCollection.add(batchSamples);
+                batches.add(batch);
             }
-            int numOfLeftSamples = samples.size() % batchSize;
-            if (numOfLeftSamples != 0) {
-                List<Sample> leftSamples = new ArrayList<>();
+            int numOfSamplesLeft = samples.size() % batchSize;
+            if (numOfSamplesLeft != 0) {
+                List<Sample> samplesLeft = new LinkedList<>();
                 for (int i = offset; i < samples.size(); i++) {
-                    leftSamples.add(samples.get(i));
+                    samplesLeft.add(samples.get(i));
                 }
-                samplesCollection.add(leftSamples);
+                batches.add(samplesLeft);
             }
         }
-        return samplesCollection;
+        return batches;
+    }
+    /* -------------------------------------------------- */
+
+    private void resetUpdates() {
+        for (int k = 0; k < updatesWeightsPerLayer.length; k++) {
+            updatesWeightsPerLayer[k] = weightsPerLayer[k].copy();
+            updatesBiasesPerLayer[k] = biasesPerLayer[k].copy();
+        }
     }
 
+    /* CALCULATE DELTAS - BACKPROPAGATION ALGORITHM */
     private void calculateDeltasPerLayer(double[] expectedOutputs) {
         // calculate deltas for output layer
         RealVector target = new ArrayRealVector(expectedOutputs);
-        RealVector actual = outputsPerLayer.get(outputsPerLayer.size() - 1).getColumnVector(0);
+        RealVector actual = outputsPerLayer[outputsPerLayer.length - 1].getColumnVector(0);
         RealVector subtraction = target.subtract(actual);
         // apply derivatives
-        RealVector derivativesOutputLayer = derivativesPerLayer.get(deltasPerLayer.size() - 1)
+        RealVector derivativesOutputLayer = derivativesPerLayer[deltasPerLayer.length - 1]
                 .getColumnVector(0);
         for (int i = 0; i < subtraction.getDimension(); i++) {
             subtraction.setEntry(i, derivativesOutputLayer.getEntry(i) * subtraction.getEntry(i));
         }
-        deltasPerLayer.get(deltasPerLayer.size() - 1).setColumnVector(0, subtraction);
+        deltasPerLayer[deltasPerLayer.length - 1].setColumnVector(0, subtraction);
         // ------------------ //
         // calculate deltas for hidden layers
-        for (int k = deltasPerLayer.size() - 2; k >= 0; k--) {
-            RealVector derivativesLayerK = derivativesPerLayer.get(k).getColumnVector(0);
-            RealMatrix weightsLayerK1 = weightsPerLayer.get(k + 1);
-            RealVector biasesLayerK1 = biasesPerLayer.get(k + 1).getColumnVector(0);
-            RealMatrix deltasLayerK1 = deltasPerLayer.get(k + 1);
-            RealMatrix deltasLayerK = deltasPerLayer.get(k);
+        for (int k = deltasPerLayer.length - 2; k >= 0; k--) {
+            RealVector derivativesLayerK = derivativesPerLayer[k].getColumnVector(0);
+            RealMatrix weightsLayerK1 = weightsPerLayer[k + 1];
+            RealVector biasesLayerK1 = biasesPerLayer[k + 1].getColumnVector(0);
+            RealMatrix deltasLayerK1 = deltasPerLayer[k + 1];
+            RealMatrix deltasLayerK = deltasPerLayer[k];
             double[] weightedSums = (weightsLayerK1.transpose().multiply(deltasLayerK1)).getColumn(0);
             // add biases
             for (int i = 0; i < weightedSums.length; i++) {
@@ -272,24 +343,56 @@ public class NeuralNetwork {
             }
         }
     }
+    /* -------------------------------------------- */
 
+    /* UPDATE WEIGHTS AND BIASES AFTER ONE SAMPLE */
     private void updateWeightsBiases(double eta) {
-        for (int k = 0; k < weightsPerLayer.size(); k++) {
-            RealMatrix weightsLayerK = weightsPerLayer.get(k);
-            RealMatrix biasesPerLayerK = biasesPerLayer.get(k);
-            RealVector outputsLayerK = outputsPerLayer.get(k).getColumnVector(0);
-            RealVector deltasLayerK1 = deltasPerLayer.get(k).getColumnVector(0);
-            for (int row = 0; row < weightsLayerK.getRowDimension(); row++) {
-                for (int column = 0; column < weightsLayerK.getColumnDimension(); column++) {
-                    double weight = weightsLayerK.getEntry(row, column);
-                    weight += eta * outputsLayerK.getEntry(column) * deltasLayerK1.getEntry(row);
-                    weightsLayerK.setEntry(row, column, weight);
+        for (int k = 0; k < updatesWeightsPerLayer.length; k++) {
+            RealMatrix updatesWeightsLayerK = updatesWeightsPerLayer[k];
+            RealMatrix updatesBiasesLayerK = updatesBiasesPerLayer[k];
+            RealVector outputsLayerK = outputsPerLayer[k].getColumnVector(0);
+            RealVector deltasLayerK1 = deltasPerLayer[k].getColumnVector(0);
+            for (int i = 0; i < updatesWeightsLayerK.getRowDimension(); i++) {
+                for (int j = 0; j < updatesWeightsLayerK.getColumnDimension(); j++) {
+                    double weight = updatesWeightsLayerK.getEntry(i, j);
+                    weight += eta * outputsLayerK.getEntry(j) * deltasLayerK1.getEntry(i);
+                    updatesWeightsLayerK.setEntry(i, j, weight);
                 }
-                double bias = biasesPerLayerK.getEntry(row, 0);
-                bias += eta * deltasLayerK1.getEntry(row);
-                biasesPerLayerK.setEntry(row, 0, bias);
+                double bias = updatesBiasesLayerK.getEntry(i, 0);
+                bias += eta * deltasLayerK1.getEntry(i);
+                updatesBiasesLayerK.setEntry(i, 0, bias);
             }
         }
     }
+    /* --------------------------------------------------- */
+
+    /* SOFTMAX FUNCTION AND ITS DERIVATIVE - USED FOR OUTPUT LAYER */
+    private static final Function<double[], double[]> SOFTMAX = zVector -> {
+        double[] tVector = Arrays.stream(zVector).map(Math::exp).toArray();
+        double sum = Arrays.stream(tVector).sum();
+        return Arrays.stream(tVector).map(t -> t / sum).toArray();
+    };
+
+    private static final Function<double[], double[]> SOFTMAX_DERIVATIVE =
+            zVector -> Arrays.stream(SOFTMAX.apply(zVector)).map(y -> y * (1 - y)).toArray();
+    /* ----------------------------------------------------------- */
+
+    /* USED FOR GUI VISUALISATION */
+    private volatile boolean stop;
+    private JComponent canvas;
+    private int redrawEveryNEpoch = -1;
+
+    public void stop() {
+        stop = true;
+    }
+
+    public void setCanvas(JComponent canvas) {
+        this.canvas = canvas;
+    }
+
+    public void setRedrawEveryNEpoch(int redrawEveryNEpoch) {
+        this.redrawEveryNEpoch = redrawEveryNEpoch;
+    }
+    /* -------------------------- */
 
 }

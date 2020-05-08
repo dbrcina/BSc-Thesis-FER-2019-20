@@ -29,14 +29,16 @@ import java.util.List;
 
 public class Window extends JFrame {
 
-    // ----HELPER VARIABLES---- //
-    private static final List<Sample> samples = new ArrayList<>();
-    private final List<ActivationFunction> functions = List.of(
+    // ----NEURAL NETWORK STUFF---- //
+    private final NeuralNetwork nn = new NeuralNetwork();
+    private NeuralNetwork.LearningType learningType;
+    private int batchSize;
+    private ActivationFunction aFunction;
+    private final ReadOnlyDataset dataset = new Cartesian2DDataset();
+    private final List<Sample> samples = new ArrayList<>();
+    private final List<ActivationFunction> aFunctions = List.of(
             new Sigmoid(), new ReLU(), new Tanh());
-    private static boolean training;
-    private static volatile boolean clear;
-    private static NeuralNetwork nn;
-    // ------------------------ //
+    // ---------------------------- //
 
     // ----CANVAS COMPONENT---- //
     private static final int CANVAS_WIDTH = 400;
@@ -46,6 +48,8 @@ public class Window extends JFrame {
 
     // ----OPTIONS PANEL---- //
     private JPanel panelOptions;
+    private JLabel lblBPType;
+    private JComboBox<String> boxBPType;
     private JLabel lblHiddenLayers;
     private JTextField fldHiddenLayers;
     private JLabel lblEta;
@@ -71,6 +75,10 @@ public class Window extends JFrame {
     private ClassType currentClassType = classTypes.get(0);
     // ------------------------ //
 
+    // --- HELPER VARIABLES --- //
+    private boolean training;
+    // ------------------------ //
+
     // ---- CONSTRUCTOR ---- //
     public Window() {
         setResizable(false);
@@ -89,16 +97,26 @@ public class Window extends JFrame {
 
     // ---- INITIALIZE OPTIONS PANEL ! ----- //
     private void initPanelOptions() {
-        panelOptions = new JPanel(new GridLayout(5, 1));
+        panelOptions = new JPanel(new GridLayout(6, 1));
         addFirstRow();
         addSecondRow();
         addThirdRow();
         addFourthRow();
         addFifthRow();
+        addSixthRow();
         getContentPane().add(panelOptions, BorderLayout.SOUTH);
     }
 
     private void addFirstRow() {
+        JPanel panelComboBox = new JPanel();
+        lblBPType = new JLabel("Backpropagation type:");
+        boxBPType = new JComboBox<>(new String[]{"Stochastic", "Batch", "Mini_Batch"});
+        panelComboBox.add(lblBPType);
+        panelComboBox.add(boxBPType);
+        panelOptions.add(panelComboBox);
+    }
+
+    private void addSecondRow() {
         JPanel panelHiddenLayers = new JPanel();
         lblHiddenLayers = new JLabel("Hidden layers:");
         fldHiddenLayers = new JTextField("5,5", 10);
@@ -107,14 +125,14 @@ public class Window extends JFrame {
         panelOptions.add(panelHiddenLayers);
     }
 
-    private void addSecondRow() {
+    private void addThirdRow() {
         JPanel panelParams = new JPanel();
-        lblIter = new JLabel("IterLimit:");
+        lblIter = new JLabel("Epochs:");
         fldIter = new JTextField("100000", 7);
         lblEta = new JLabel("Eta:");
         fldEta = new JTextField("0.1", 5);
         lblErr = new JLabel("MaxError:");
-        fldErr = new JTextField("0.002", 5);
+        fldErr = new JTextField("0.02", 5);
         panelParams.add(lblIter);
         panelParams.add(fldIter);
         panelParams.add(lblEta);
@@ -124,7 +142,7 @@ public class Window extends JFrame {
         panelOptions.add(panelParams);
     }
 
-    private void addThirdRow() {
+    private void addFourthRow() {
         JPanel panelClassType = new JPanel();
         lblClassType = new JLabel("Class type:");
         fldClassType = new JTextField(6);
@@ -147,7 +165,7 @@ public class Window extends JFrame {
         panelOptions.add(panelClassType);
     }
 
-    private void addFourthRow() {
+    private void addFifthRow() {
         JPanel panelButtons = new JPanel();
         btnGroup = new ButtonGroup();
         btnSigmoid = new JRadioButton("Sigmoid neuron");
@@ -163,7 +181,7 @@ public class Window extends JFrame {
         panelOptions.add(panelButtons);
     }
 
-    private void addFifthRow() {
+    private void addSixthRow() {
         JPanel panelButtons = new JPanel();
         btnTrain = new JButton("Train");
         btnTrain.setFocusPainted(false);
@@ -189,7 +207,7 @@ public class Window extends JFrame {
             samples.clear();
             btnDeleteLast.setEnabled(false);
             btnClearAll.setEnabled(false);
-            clear = true;
+            training = false;
             canvas.repaint();
         });
         btnDeleteLast.addActionListener(evt -> {
@@ -214,56 +232,76 @@ public class Window extends JFrame {
             for (int hLayer : hiddenLayers) {
                 layers[offset++] = hLayer;
             }
+            nn.setLayers(layers);
             Enumeration<AbstractButton> buttons = btnGroup.getElements();
-            ActivationFunction activationFunction = null;
             while (buttons.hasMoreElements()) {
                 AbstractButton btn = buttons.nextElement();
                 if (btn.isSelected()) {
                     switch (btn.getText().split("\\s+")[0]) {
                         case "Sigmoid":
-                            activationFunction = functions.get(0);
+                            aFunction = aFunctions.get(0);
                             break;
                         case "ReLu":
-                            activationFunction = functions.get(1);
+                            aFunction = aFunctions.get(1);
                             break;
                         case "Tanh":
-                            activationFunction = functions.get(2);
+                            aFunction = aFunctions.get(2);
                             break;
                         default:
                     }
                     break;
                 }
             }
+            nn.setAFunction(aFunction);
             List<Sample> normalized = new ArrayList<>();
             for (Sample s : samples) {
                 double[] sInputs = s.getInputs();
                 double[] inputs = {transformX(sInputs[0]), transformY(sInputs[1])};
                 normalized.add(new Sample(inputs, s.getOutputs()));
             }
-            ReadOnlyDataset dataset = new Cartesian2DDataset(normalized);
-            nn = new NeuralNetwork(layers, activationFunction, dataset);
+            dataset.setSamples(normalized);
+            nn.setDataset(dataset);
+            String type = (String) boxBPType.getSelectedItem();
+            if (type.equals("Stochastic")) {
+                learningType = NeuralNetwork.LearningType.ONLINE;
+            } else if (type.equals("Batch")) {
+                learningType = NeuralNetwork.LearningType.BATCH;
+            } else {
+                learningType = NeuralNetwork.LearningType.MINI_BATCH;
+            }
+            if (learningType == NeuralNetwork.LearningType.MINI_BATCH) {
+                do {
+                    String bSize = JOptionPane.showInputDialog(this, "Enter batch size:");
+                    if (bSize == null || !bSize.matches("^[1-9]\\d*$")) {
+                        JOptionPane.showMessageDialog(this, "Enter natural number.");
+                    } else {
+                        batchSize = Integer.parseInt(bSize);
+                        break;
+                    }
+                } while (true);
+            }
+            nn.setLearningType(learningType);
+            nn.setBatchSize(batchSize);
             nn.setCanvas(canvas);
-            nn.setRedrawEveryNIter(1000);
-            int iterLimit = Integer.parseInt(fldIter.getText());
+            nn.setRedrawEveryNEpoch(1000);
+            int epochs = Integer.parseInt(fldIter.getText());
             double maxError = Double.parseDouble(fldErr.getText());
             double eta = Double.parseDouble(fldEta.getText());
-            btnStop.setEnabled(true);
             new Thread(() -> {
                 training = true;
-                nn.train(iterLimit, maxError, eta);
+                nn.train(epochs, maxError, eta);
+                btnStop.setEnabled(false);
                 canvas.repaint();
             }).start();
+            btnStop.setEnabled(true);
         });
-        btnStop.addActionListener(evt -> {
-            nn.stop();
-            System.out.println("Stopped");
-        });
+        btnStop.addActionListener(evt -> nn.stop());
     }
     // ------------------------------------- //
 
     // ---- INITIALIZE CANVAS COMPONENT ! ----- //
     private void initCanvasComponent() {
-        canvas = new CanvasComponent(CANVAS_WIDTH, CANVAS_HEIGHT);
+        canvas = new CanvasComponent(this, CANVAS_WIDTH, CANVAS_HEIGHT);
         canvas.addMouseListener(new MouseAdapter() {
             private int classTypesIndex = 0;
 
@@ -310,7 +348,11 @@ public class Window extends JFrame {
      * Canvas which represents Cartesian 2D coordinate system.
      */
     private static class CanvasComponent extends JComponent {
-        public CanvasComponent(int width, int height) {
+
+        private final Window window;
+
+        public CanvasComponent(Window window, int width, int height) {
+            this.window = window;
             setPreferredSize(new Dimension(width, height));
             setBorder(new TitledBorder(new EtchedBorder(), "Canvas"));
         }
@@ -324,16 +366,15 @@ public class Window extends JFrame {
             g2d.setColor(Color.WHITE);
             g2d.fillRect(0, 0, grid.width, grid.height);
 
-            boolean training = Window.training;
-            if (training) {
+            if (window.training) {
                 drawTraining(g2d, grid);
             }
-            drawControlPoints(g2d, grid, training);
-            //Window.training = false;
+            drawControlPoints(g2d, grid, window.training);
         }
 
         private void drawControlPoints(Graphics2D g2d, Rectangle2D grid, boolean training) {
-            for (Sample sample : samples) {
+            g2d.setStroke(new BasicStroke(2));
+            for (Sample sample : window.samples) {
                 double[] inputs = sample.getInputs();
                 int x = (int) inputs[0] - grid.x;
                 int y = (int) inputs[1] - grid.y;
@@ -343,7 +384,7 @@ public class Window extends JFrame {
                 Shape shape = classType.createShape(new Rectangle2D(x - width / 2, y - height / 2, width,
                         height));
                 if (training) {
-                    g2d.setColor(Color.BLACK);
+                    g2d.setColor(Color.WHITE);
                     g2d.draw(shape);
                 } else {
                     g2d.setColor(classType.getColor());
@@ -356,7 +397,7 @@ public class Window extends JFrame {
             for (int x = 0; x < grid.width; x++) {
                 for (int y = 0; y < grid.height; y++) {
                     double[] inputs = {1.0 * x / grid.width, 1.0 * y / grid.height};
-                    double[] outputs = nn.feedForward(inputs);
+                    double[] outputs = window.nn.feedForward(inputs);
                     ClassType classType = ClassType.forOutputs(outputs);
                     g2d.setColor(classType.getColor());
                     g2d.fillRect(x, y, 2, 2);

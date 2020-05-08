@@ -32,4 +32,6 @@ public interface ReadOnlyDataset {
 
     List<Sample> samples();
 
+    void setSamples(List<Sample> samples);
+
 }

@@ -3,8 +3,7 @@ package hr.fer.zemris.fthesis.ann.dataset;
 import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
 
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -14,10 +13,11 @@ import java.util.Objects;
  */
 public class Cartesian2DDataset implements ReadOnlyDataset {
 
-    private final List<Sample> samples;
+    private List<Sample> samples;
 
-    public Cartesian2DDataset(Collection<Sample> samples) {
-        this.samples = new ArrayList<>(samples);
+    @Override
+    public void setSamples(List<Sample> samples) {
+        this.samples = samples;
     }
 
     @Override
@@ -38,7 +38,7 @@ public class Cartesian2DDataset implements ReadOnlyDataset {
 
     @Override
     public List<Sample> samples() {
-        return samples;
+        return new LinkedList<>(samples);
     }
 
 }
