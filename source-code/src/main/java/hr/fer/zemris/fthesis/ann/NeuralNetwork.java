@@ -136,7 +136,7 @@ public class NeuralNetwork {
     }
     /* ------------------------------- */
 
-    /* RANDOM INITIALIZATION BETWEEN [-1,1] */
+    /* XAVIER INITIALIZATION */
     private void randomizeMatrices() {
         if (!matricesRandomized) {
             matricesRandomized = true;
@@ -146,13 +146,17 @@ public class NeuralNetwork {
             RealMatrix biasesLayerK = biasesPerLayer[k];
             for (int i = 0; i < weightsLayerK.getRowDimension(); i++) {
                 for (int j = 0; j < weightsLayerK.getColumnDimension(); j++) {
-                    weightsLayerK.setEntry(i, j, rand.nextDouble() * 2 - 1);
+                    double weight = rand.nextGaussian();
+                    weight *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
+                    weightsLayerK.setEntry(i, j, weight);
                 }
-                biasesLayerK.setEntry(i, 0, rand.nextDouble() * 2 - 1);
+                double bias = rand.nextGaussian();
+                bias *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
+                biasesLayerK.setEntry(i, 0, bias);
             }
         }
     }
-    /* ------------------------------------ */
+    /* --------------------- */
 
     /**
      * Feed forwards provided <i>inputs</i> and returns outputs as an array.
