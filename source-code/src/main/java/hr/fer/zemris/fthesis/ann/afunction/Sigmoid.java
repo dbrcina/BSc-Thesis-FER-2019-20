@@ -9,7 +9,8 @@ public class Sigmoid implements ActivationFunction {
 
     @Override
     public double derivativeValueAt(double x) {
-        return valueAt(x) * (1 - valueAt(x));
+        double temp = valueAt(x);
+        return temp * (1 - temp);
     }
 
 }
