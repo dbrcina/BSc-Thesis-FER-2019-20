@@ -23,16 +23,32 @@
 Uvod rada. Nakon uvoda dolaze poglavlja u kojima se obrađuje tema.
 
 \chapter{Pregled područja}
-Pitate li se ikada što je to inteligencija te čemu nam služi, nama ljudima. To pitanje postavljeno je još za vrijeme začetka filozofije kao znanosti kada su se tadašnji filozofi pitali kako i na koji način je ljudsko razmišljanje, učenje i pamćenje ostvareno. Ni dan danas ne postoji jednoznačan odgovor na to pitanje jer ljudski mozak i dalje predstavlja jednu veliku nepoznanicu koja vjerojatno nikada ili ne tako skoro neće biti razriješena. No znanost je podosta napredovala i shodno tomu se razvila želja da se ljudska inteligencija pokuša pretočiti u nekakvu vrstu inteligencije strojeva.
+Pitate li se ikada što je to inteligencija te čemu nam služi. To pitanje postavljeno je još za vrijeme začetka filozofije kao znanosti kada su se tadašnji filozofi pitali kako i na koji način je ljudsko razmišljanje, učenje i pamćenje ostvareno. Ni dan danas ne postoji jednoznačan odgovor na to pitanje jer ljudski mozak i dalje predstavlja jednu veliku nepoznanicu koja vjerojatno nikada ili ne tako skoro neće biti razriješena. No znanost je podosta napredovala i shodno tomu se razvila želja da se ljudska inteligencija pokuša pretočiti u nekakvu vrstu inteligencije strojeva.
 
-Početak ovakvog razmišljanja datira od 50-tih godina dvadesetog stoljeća kada Alan Turing u članku \textit{Computing Machinery and Intelligence} časopisa \textit{Mind} postavlja pitanje: Mogu li strojevi misliti? \engl{Can machines think?} na koje pokušava odgovoriti kroz tzv. igru imitacije \engl{imitation game}. Sudionici igre su tri osobe: igrač A, igrač B i igrač C gdje su igrači A i B ispitanici a igrač C ispitivač. Cilj igrača C je utvrditi spol ispitanika postavljanjem pitanja, cilj igrača B je pomoći ispitivaču C a cilj igrača A je navesti ispitivača C na pogrešnu identifikaciju. Što će se dogoditi ako stroj uzme mjesto igrača A? Ako broj pogrešaka igrača C bude gotovo jednak u oba slučaja, onda je stroj inteligentan \citep{turingAI}.
+Početak ovakvog razmišljanja datira od 50-tih godina dvadesetog stoljeća kada Alan Turing u članku \textit{Computing Machinery and Intelligence} časopisa \textit{Mind} postavlja pitanje: Mogu li strojevi misliti? \engl{Can machines think?} na koje pokušava odgovoriti kroz tzv. igru imitacije \engl{imitation game}. Sudionici igre su tri igrača: igrač A, igrač B i igrač C gdje su igrači A i B ispitanici a igrač C ispitivač. Cilj igrača C je utvrditi spol ispitanika postavljanjem pitanja, cilj igrača B je pomoći ispitivaču C a cilj igrača A je navesti ispitivača C na pogrešnu identifikaciju. Što će se dogoditi ako stroj uzme mjesto igrača A? Ako broj pogrešaka igrača C bude gotovo jednak u oba slučaja, onda je stroj inteligentan. \citep{turingAI}. Ovakav princip se često naziva turingov test \engl{Turing test}.
 
-1956. se održava konferencija u Dartmouthu \citep{wiki:DART} na inicijativu John McCarthy-a, tadašnjeg mladog profesora matematike na fakultetu u Dartmouthu, koji okuplja oko sebe nekolicinu znanstvenika i prijatelja kako bi pokušali koncepte ljudske inteligencije preslikati u inteligenciju strojeva. Cilj je pokazati kako strojevi koriste jezik, kako zaključuju i stvaraju apstraktne koncepte i kako vremenom postaju sve prilagodljiviji na predočene probleme baš kao i ljudi. Inicijalna ideja je bila da se neki od navedenih problema može dokazati s nekolicinom dobrih znanstvenika i kroz period od jednog ljeta (McCarthy et al. 1955). To naravno nije bilo moguće. Time se formalno uvodi pojam \textit{umjetna inteligencija}.
+1956. se održava konferencija u Dartmouthu \citep{wiki:DART} na inicijativu John McCarthy-a, tadašnjeg mladog profesora matematike na fakultetu u Dartmouthu, koji okuplja oko sebe nekolicinu znanstvenika i prijatelja kako bi pokušali koncepte ljudske inteligencije preslikati u inteligenciju strojeva. Cilj je pokazati kako strojevi koriste jezik, kako zaključuju i stvaraju apstraktne koncepte i kako vremenom postaju sve prilagodljiviji na predočene probleme baš kao i ljudi. Inicijalna ideja je bila da se neki od navedenih problema može dokazati uz manju skupinu dobrih znanstvenika i kroz period od jednog ljeta (McCarthy et al. 1955). To naravno nije bilo moguće. Time se formalno uvodi pojam \textit{umjetna inteligencija}.
 
 \section{Umjetna inteligencija}
-Kao što je anticipirano ranije, umjetna inteligencija \engl{artificial intelligence} je laički rečeno inteligencija strojeva a znanost koja se jednim dijelom bavi proučavanjem umjetne inteligencije jest računarska znanost \engl{computer science}. Glavna ideja je da se većina
+Kao što je anticipirano ranije, umjetna inteligencija \engl{artificial intelligence} je laički rečeno inteligencija strojeva a znanost koja se jednim dijelom bavi proučavanjem umjetne inteligencije jest računarska znanost \engl{computer science}.
 
-Primjena umjetne inteligencije danas je izrazito rasprostranjena kroz gotovo svaku industriju. Pronalazimo ju u medicini, automobilskoj industriji, robotici, pa i u sportskoj i industriji igara. Jedan od značajnijih primjera primjene umjetne inteligencije je
+Primjena umjetne inteligencije danas je izrazito rasprostranjena kroz gotovo svaku industriju. Pronalazimo ju u medicini, automobilskoj industriji, robotici, pa i u sportskoj i industriji igara. Jedan od poznatijih događaja koji prikazuje primjenu umjetne inteligencije dogodio se 2016. kada je računalo naziva \textit{AlphaGo} u igri \textit{Go} uspijelo pobijediti svjetskog prvaka Lee Sedolu rezultatom 4:1 te time ostvario velik uspjeh u svijetu umjetne inteligencije kao i pažnju javnosti \citep{moyerGO}.
+
+Umjetnu inteligenciju je dakako potrebno trenirati i učiti pa je tako učenje podijeljeno na dvije veće cjeline:
+\begin{center}
+    \begin{enumerate}
+        \item Simboličko učenje
+        \item Strojno učenje.
+    \end{enumerate}
+\end{center}
+
+\subsection{Simboličko učenje}
+Simbolička umjetna inteligencija \engl{symbolic artificial intelligence} je izraz koji definira skup istraživačkih metoda koje se temelje na ljudima lako čitljivim simbolima \engl{human-readable simbol} koji modeliraju probleme i logiku. Jedan od najboljih primjera jesu \textit{ekspertni sustavi} koji se temelje na skupu pravila. Pravila su modelirana na sličan način kao i Ako-Onda rečenica \engl{If-Then statement} koja je u ljudskoj komunikaciji svakodnevno u upotrebi. Također, razne vrste logika poput propozicijska \engl{Propositional logic}, često referirana kao Boolova algebra, logika prvog reda \engl{First order logic}, poznatija kao predikatna logika \engl{Predicate logic}, neizrazita logika \engl{Fuzzy logic} pripadaju upravo simboličkoj umjetnoj inteligenciji. Ovakav način učenja bio je popularan početkom 1950. sve do kraja 1980 \citep{wiki:SIMB}.
+
+\subsection{Strojno učenje}
+Strojno učenje \engl{Machine learning, ML} predstavlja niz metoda i algoritama koji sustavima pružaju stjecanje novog znanja kroz modeliranje obrazaca koje onda kasnije mogu iskoristiti za predviđanje novih podataka ili sličnih \citep{cupicML}. Glavna ideja je da sustavi uče iz iskustva, empirijski, bez da se programska implementacija mijenja što znatno olakšava manipulaciju istih.
+
+Danas postoji nezgrapno puno podataka koje je moguće i koje je potrebno iskoristiti za učenje pa je cilj konstruirati sustave koji mogu iskoristiti baš te podatke za neka korisna ponašanja poput predviđanja i raspoznavanja raznih uzoraka \citep{cupicML}.
 
 \chapter{Zaključak}
 Zaključak.
