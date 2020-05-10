@@ -150,9 +150,9 @@ public class NeuralNetwork {
                     weight *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
                     weightsLayerK.setEntry(i, j, weight);
                 }
-                double bias = rand.nextGaussian();
-                bias *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
-                biasesLayerK.setEntry(i, 0, bias);
+                //double bias = rand.nextGaussian();
+                //bias *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
+                biasesLayerK.setEntry(i, 0, 0.0);
             }
         }
     }
