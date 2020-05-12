@@ -69,7 +69,7 @@ Strojno učenje dijelimo na četiri područja:
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.35]{img/clustering.jpg}
+    \includegraphics[scale=0.75]{img/clustering.jpg}
     \caption[Caption for LOF]{Primjer grupiranja\footnotemark}
     \label{fig:clustering}
 \end{figure}
@@ -104,13 +104,13 @@ Nadzirano učenje \engl{supervised learning} je vrsta učenja čiji je cilj sve 
 
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.33]{img/supervised-learning-flow.png}
+    \includegraphics[scale=0.5]{img/supervised-learning-flow.png}
     \caption[Caption for LOF]{Model strojnog učenja\footnotemark}
     \label{fig:supervised-learning-flow}
 \end{figure}
 \footnotetext{Preuzeto iz literature \citep{cupicML}.}
 
-Tijekom faze učenja, modelu se predaje skup ulaznih podataka za učenje \engl{training set}. Svaki podatak skupa možemo notirati kao $(\textbf{x}, y)\textsubscript{i}$ što predstavlja \textit{i}-ti testni primjer gdje \textbf{x} predstavlja vektor ulaznih podataka, a \textit{y} vrijednost pridružena ulaznom vektoru, odnosno oznaku \engl{label}. Ulazni podatak često može biti kompleksne naravi što znači da ga je potrebno "razbiti" u manje cjeline. Takav postupak se naziva vađenje značajki \engl{feature extraction}. Rezultat navedenog je kolekcija značajki koja se predaje određenom algoritmu strojnog učenja. Npr. ulazni podatci mogu biti razne gume poput gume automobila, gume bicikla, gume traktora i sl. a značajka bi onda mogla biti volumen gume, oblik gume, boja gume i sl. Algoritam strojnog učenja će na temelju predanih značajki pokušati optimizirati paremetre odabranog modela kako bi se isti mogao koristiti u sljedećoj fazi.
+Tijekom faze učenja, modelu se predaje skup ulaznih podataka za učenje \engl{training set}. Svaki podatak skupa možemo notirati kao $(\textbf{x}, y)\textsubscript{i}$ što predstavlja \textit{i}-ti primjer iz skupa za učenje gdje \textbf{x} predstavlja vektor ulaznih podataka, a \textit{y} vrijednost pridružena ulaznom vektoru, odnosno oznaku \engl{label}. Ulazni podatak često može biti kompleksne naravi što znači da ga je potrebno "razbiti" u manje cjeline. Takav postupak se naziva vađenje značajki \engl{feature extraction}. Rezultat navedenog je kolekcija značajki koja se zatim predaje određenom algoritmu strojnog učenja. Npr. ulazni podatci mogu biti razne gume poput gume automobila, gume bicikla, gume traktora i sl. a značajka bi onda mogla biti volumen gume, oblik gume, boja gume i sl. Algoritam strojnog učenja će na temelju predanih značajki pokušati optimizirati parametre odabranog modela kako bi se isti mogao koristiti u sljedećoj fazi.
 
 \bigskip
 
@@ -128,23 +128,124 @@ Unakrsna provjera \engl{cross-validation} je postupak koji se koristi tijekom fa
 \end{figure}
 \footnotetext{Preuzeto iz literature \citep{cupicANN}.}
 
-Također postoji mogućnost da neki od parametara modela utječe na njegovu složenost. Shodno tomu se uvodi još jedan skup, skup za testiranje \engl{testing set}. Ideja je sljedeća: skup podataka razdijelimo u sva tri do sada navedena skupa i normalno provedemo fazu učenja modela uz malu promjenu. Nakon što model završi sa fazom učenja, malo ga modificiramo te ponovno učimo i sve dok ne naučimo neki određeni broj modela. Nakon što završimo sa fazom učenja onda svaki od modela ispitujemo nad skupom za testiranje te onog koji ima minimalnu pogrešku ćemo uzeti kao optimalnog \citep{cupicML}.
+Također postoji mogućnost da neki od parametara modela utječu na njegovu složenost. Shodno tomu se uvodi još jedan skup, skup za testiranje \engl{testing set}. Ideja je sljedeća: skup podataka razdijelimo u sva tri do sada navedena skupa i normalno provedemo fazu učenja modela uz malu promjenu. Umjesto da se zadovoljimo samo jednim naučenim modelom, pokušavamo pronaći onaj model koji će najbolje minimizirati pogrešku nad skupom za testiranje \citep{cupicML}.
 
 \section{Problemi nadziranog učenja}
 
-Probleme koje rješavamo nadziranim učenjem su \textit{regresija} i \textit{klasifikacija}.
+Zadatak nadziranog učenja je sljedeći: pretpostavimo da imamo skup za učenje koji se sastoji od \textit{N} različitih parova ulaza i izlaza;
+\[(\textbf{x}\textsubscript{1}, y\textsubscript{1}), (\textbf{x}\textsubscript{2}, y\textsubscript{2}),
+(\textbf{x}\textsubscript{3}, y\textsubscript{3}),...,
+(\textbf{x}\textsubscript{N}, y\textsubscript{N})\]
+gdje \textbf{x\textsubscript{i}} predstavlja \textit{i}-ti vektor ulaznih podataka dok \textit{y\textsubscript{i}} \textit{i}-ti željeni izlaz koji je generiran nekom nepoznatom funkcijom $y=f(x)$. \newline
+Potrebno je pronaći takvu funkciju \textit{h} koja će najbolje aproksimirati funkciju \textit{f}.
+
+Funckija \textit{h} naziva se hipoteza \engl{hypothesis} i pripada nekom skupu svih hipoteza \textbf{H} koje donekle aproksimiraju zadanu funkciju \textit{f}, neke bolje, neke lošije. U ovom trenutku uključujemo skup za testiranje u proces učenja jer je potrebno pronaći onu hipotezu za koju će aproksimacija biti najbolja, tj. ukupna pogreška generirana tijekom učenja modela bit će minimalna. Time će se osigurati da model poprimi svojstvo generalizacije. Često se pokazuje da je funkcija \textit{f} stohastička \engl{stochastic}, što znači da ne ovisi uvijek samo o varijabli \textit{x} pa se mora koristiti i uvjetovana vjerojatnost $P(Y|x)$ tijekom faze učenja modela \citep{russelAI}\footnote{Iz poglavlja 18.2 Nadzirano učenje.}.
+
+Kao što je rečeno ranije, \textit{y\textsubscript{i}} predstavlja \textit{i}-ti željeni izlaz za \textit{i}-ti ulaz te može poprimiti vrijednost broja ili vrijednost iz nekog konačnog skupa podataka. Ako je slučaj da je izlaz broj, radi se o problemu koji se naziva \textit{regresija}, a ako je slučaj da je izlaz vrijednost iz nekog konačnog skupa podataka, onda se radi o problemu koji se naziva \textit{klasifikacija}.
 
 \subsection{Regresija}
-Regresija
+Regresija \engl{regression} je tehnika, tj. algoritam nadziranog učenja koji se koristi kada je potrebno predvidjeti određeni iznos neke funkcije u odnosu na određene parametre. Dakle, dane podatke potrebno je aproksimirati nekom proizvoljnom funkcijom \textit{h} koja je često polinomijalna. Postoje različite vrste regresije pa spomenimo neke od njih. 
+
+Prije svega, postoji regresija s jednom varijablom \engl{regression with one variable} i regresija sa više varijabli \engl{multivariate regression}. Razlika je očita, no pokažimo to na kratkom primjeru. Recimo da želimo modelirati cijene obiteljskih kuća u okolici Zagreba. Za to su nam potrebni neki parametri na temelju kojih ćemo moći vršiti predikcije kao npr. broj kvadratnih metara (m\textsuperscript{2}), broj spavaćih soba, blizina vrtića i škola, povezanost sa javnim prijevozom i sl. U slučaju regresije s jednom varijablom, za modeliranje bi uzeli samo jedan od navedenih parametara, dok bi u slučaju regresije sa više varijabli uzeli sve ili dio navedenih. Dakle, očigledno je da je regresija s jednom varijablom konkretan slučaj regresije sa više varijabli.
+
+\bigskip
+
+\textit{Linearna regresija} \engl{linear regression} je tip regresije koji koristi linearnu krivulju (pravac), tj. polinom prvog stupnja kao aproksimacijsku krivulju.
+
+
+\textit{Polinomijalna regresija} \engl{polynom regression} je tip regresije koji koristi polinom reda \textit{r} kao aproksimacijsku krivulju.
+
+Na slikama \ref{fig:linear-regression} i \ref{fig:polynom-regression} su prikazani navedeni tipovi regresija.
+
+\bigskip
+
+Dakle, regresija je metoda koja se koristi za predviđanje numeričkih ishoda.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{img/linear-regression.png}
+    \caption[Caption for LOF]{Primjer linearne regresije\footnotemark}
+    \label{fig:linear-regression}
+\end{figure}
+\footnotetext{Preuzeto iz literature \citep{cupicML}.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{img/polynom-regression.png}
+    \caption[Caption for LOF]{Primjer polinomijalne regresije sa kubnim polinomom\footnotemark}
+    \label{fig:polynom-regression}
+\end{figure}
+% \footnotetext{Preuzeto iz literature \citep{cupicML}.}
+\footnotetext{Preuzeto iz literature \citep{cupicML}.}
 
 \subsection{Klasifikacija}
-Klasifikacija
+Klasifikacija \engl{classification} je tehnika, tj. algoritam nadziranog učenja koji se koristi kada je određeni ulazni podatak potrebno smjestiti odnosno klasificirati kao pripadnika određenog razreda. Izlazi tako organiziranog modela često poprimaju diskretne vrijednosti za razliku od regresije i takav model onda nazivamo klasifikator \engl{classifier}. Razlikujemo nekoliko različitih tipova klasifikatora:
+
+\begin{enumerate}
+    \item binarni klasifikator,
+    \item višerazredni klasifikator te
+    \item klasifikator više oznaka.
+\end{enumerate}
+
+\smallskip
+
+Binarni klasifikator \engl{binary classifier} je tip klasifikatora koji zna odrediti pripada li ulazni podatak jednom od ukupno dva moguća razreda. Npr. sustav kao ulaze prima slike na kojima se nalazi ili mačka ili pas. Jednom naučeni klasifikator bi na temelju predane slike morao moći odrediti što se nalazi na slici, mačka ili pas. Naravno uz uvjet da se preda slika mačke ili psa.
+
+Višerazredni klasifikator \engl{multi-class classifier} je tip klasifikatora koji zna odrediti pripada li ulazni podatak jednom od barem tri moguća razreda. Dakle, mora postojati minimalno tri različita razreda kako bi se klasifikator nazivao višerazrednim. U ovom radu ćemo se više fokusirati upravo na navedenom klasifikator koji će naučiti raspoznati tri moguća razreda, no o tome nešto kasnije.
+
+Klasifikator više oznaka \engl{multi-label classifier} je tip klasifikatora koji predstavlja generalizaciju višerazrednog klasifikatora. Pogledajmo sljedeći primjer klasifikacije filmova za bolje razumijevanje. Pretpostavimo da film može imati sljedeće oznake: $(12+)$, $(16+)$ i $(18+)$ gdje svaka oznaka predstavlja minimalan broj godina kojih gledaoc filma mora imati. Određivanje oznake za pojedini film je rezultat korištenja višerazrednog klasifikatora jer je potrebno odrediti pripada li film samo jednom od navedene tri oznake. No što ako film poželimo klasificirati pomoću žanrova? Tada nam višerazredni klasifikator neće puno pomoći jer jedan film može imati više oznaka kao npr. "drama" i "komedija" i sl. Tada ćemo koristiti klasifikator više oznaka.
+
+\bigskip
+
+Klasifikaciju, kao i regresiju, možemo podijeliti na \textit{linearnu klasifikaciju} i \textit{nelinearnu klasifikaciju}, odnosno polinomijalnu.
+
+Linearna klasifikacija \engl{linear classification} je tip klasifikacije u kojoj se granica između razreda aproksimira pomoću linearna krivulje, tj. pravca.
+
+Nelinearna klasifikacija \engl{non-linear classification} je tip klasifikacije u kojoj se granica između razreda aproksimira pomoću nelinearne krivulje koja je često polinomijalna.
+
+Ono što je zajedničko u oba slučaja je postojanje granice između razreda koja se u literaturi naziva \textit{decizijska granica} \citep{cupicANN}. O oblicima decizijskih granica će biti riječ kasnije.
+
+Na slikama \ref{fig:linear-classification} i \ref{fig:non-linear-classification} su prikazani primjeri klasifikacija.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{img/linear-classification.png}
+    \caption[Caption for LOF]{Primjer linearne klasifikacije\footnotemark}
+    \label{fig:linear-classification}
+\end{figure}
+\footnotetext{Rezultat programske implementacije.}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.8]{img/non-linear-classification.png}
+    \caption[Caption for LOF]{Primjer nelinearne klasifikacije\footnotemark}
+    \label{fig:non-linear-classification}
+\end{figure}
+\footnotetext{Rezultat programske implementacije.}
 
 \section{Algoritmi}
-Algoritmi
+U području nadziranog učenja postoji veliki broj algoritama koji uvelike pridonose boljem učenju. Neki od poznatijih su:
+
+\begin{itemize}
+    \item Stroj za podršku vektorima \engl{support-vector machine, SVM},
+    \item Stabla odluke \engl{decision trees},
+    \item Naivni Bayesov klasifikator \engl{naive Bayes classifier},
+    \item Slučajne šume \engl{random forests},
+    \item Algoritam k-najbližih susjeda \engl{k-nearest neighbors algorithm},
+    \item Umjetna neuronska mreža \engl{artificial neural network} i mnogi drugi.
+\end{itemize}
+
+\bigskip
+
+Vidimo da postoji jako velika paleta algoritama od kojih su neki složeniji od drugih, neki daju bolje rezultate od drugih, no niti jedan od algoritama
+nije u stanju uvijek dati najbolje rezultate za proizvoljan problem nadziranog učenja \citep{wiki:SUP}. Zbog navedenog vrijedi tzv. \textit{No free lunch} teorem koji nalaže da je za probleme koji zahtijevaju mnogo računalnih resursa poput pretraživanja prostora stanja i optimizacije parametara složenost u prosjeku jednaka za sve metode \citep{wiki:NFL}.
+
+\bigskip
+\bigskip
+
+U sljedećem poglavlju ćemo se detaljnije baviti algoritmom \textit{umjetna neuronska mreža}. Pogledat ćemo kako je izgledala prva neuronska mreža, koje sve mreže postoje, arhitekturu unaprijedne neuronske mreže te algoritam kojim unaprijedna neuronska mreža uči.
 
 \chapter{Umjetne neuronske mreže}
-ANN
 
 \chapter{Rezultati}
 Rezultati
@@ -152,6 +253,7 @@ Rezultati
 \chapter{Zaključak}
 Zaključak.
 
+\Urlmuskip=0mu plus 1mu\relax
 \bibliography{literatura}
 \bibliographystyle{fer}
 \nocite{*}
