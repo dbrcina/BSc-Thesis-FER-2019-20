@@ -23,7 +23,7 @@
 \chapter{Uvod}
 Uvod rada. Nakon uvoda dolaze poglavlja u kojima se obrađuje tema.
 
-\chapter{Pregled područja}
+\chapter{{Pregled područja}}
 Pitate li se ikada što je to inteligencija te čemu nam služi. To pitanje postavljeno je još za vrijeme začetka filozofije kao znanosti kada su se tadašnji filozofi pitali kako i na koji način je ljudsko razmišljanje, učenje i pamćenje ostvareno. Ni dan danas ne postoji jednoznačan odgovor na to pitanje jer ljudski mozak i dalje predstavlja jednu veliku nepoznanicu koja vjerojatno nikada ili ne tako skoro neće biti razriješena. No znanost je podosta napredovala i shodno tomu se razvila želja da se ljudska inteligencija pokuša pretočiti u nekakvu vrstu inteligencije strojeva.
 
 Početak ovakvog razmišljanja datira od 50-tih godina dvadesetog stoljeća kada Alan Turing u članku \textit{Computing Machinery and Intelligence} časopisa \textit{Mind} postavlja pitanje: Mogu li strojevi misliti? \engl{Can machines think?} na koje pokušava odgovoriti kroz tzv. igru imitacije \engl{imitation game}. Sudionici igre su tri igrača: igrač A, igrač B i igrač C gdje su igrači A i B ispitanici a igrač C ispitivač. Cilj igrača C je utvrditi spol ispitanika postavljanjem pitanja, cilj igrača B je pomoći ispitivaču C a cilj igrača A je navesti ispitivača C na pogrešnu identifikaciju. Što će se dogoditi ako stroj uzme mjesto igrača A? Ako broj pogrešaka igrača C bude gotovo jednak u oba slučaja, onda je stroj inteligentan. \citep{turingAI}. Ovakav princip se često naziva turingov test \engl{Turing test}.
@@ -139,7 +139,7 @@ Zadatak nadziranog učenja je sljedeći: pretpostavimo da imamo skup za učenje 
 gdje \textbf{x\textsubscript{i}} predstavlja \textit{i}-ti vektor ulaznih podataka dok \textit{y\textsubscript{i}} \textit{i}-ti željeni izlaz koji je generiran nekom nepoznatom funkcijom $y=f(x)$. \newline
 Potrebno je pronaći takvu funkciju \textit{h} koja će najbolje aproksimirati funkciju \textit{f}.
 
-Funckija \textit{h} naziva se hipoteza \engl{hypothesis} i pripada nekom skupu svih hipoteza \textbf{H} koje donekle aproksimiraju zadanu funkciju \textit{f}, neke bolje, neke lošije. U ovom trenutku uključujemo skup za testiranje u proces učenja jer je potrebno pronaći onu hipotezu za koju će aproksimacija biti najbolja, tj. ukupna pogreška generirana tijekom učenja modela bit će minimalna. Time će se osigurati da model poprimi svojstvo generalizacije. Često se pokazuje da je funkcija \textit{f} stohastička \engl{stochastic}, što znači da ne ovisi uvijek samo o varijabli \textit{x} pa se mora koristiti i uvjetovana vjerojatnost $P(Y|x)$ tijekom faze učenja modela \citep{russelAI}\footnote{Iz poglavlja 18.2 Nadzirano učenje.}.
+Funckija \textit{h} naziva se hipoteza \engl{hypothesis} i pripada nekom skupu svih hipoteza \textbf{H} koje donekle aproksimiraju zadanu funkciju \textit{f}, neke bolje, neke lošije. U ovom trenutku uključujemo skup za testiranje u proces učenja jer je potrebno pronaći onu hipotezu za koju će aproksimacija biti najbolja, tj. ukupna pogreška generirana tijekom učenja modela bit će minimalna. Time će se osigurati da model poprimi svojstvo generalizacije. Često se pokazuje da je funkcija \textit{f} stohastička \engl{stochastic}, što znači da ne ovisi uvijek samo o varijabli \textit{x} pa se mora koristiti i uvjetovana vjerojatnost $P(Y|x)$ tijekom faze učenja modela \citep{russelAI}\footnote{Iz poglavlja 18.2 Supervised learning.}.
 
 Kao što je rečeno ranije, \textit{y\textsubscript{i}} predstavlja \textit{i}-ti željeni izlaz za \textit{i}-ti ulaz te može poprimiti vrijednost broja ili vrijednost iz nekog konačnog skupa podataka. Ako je slučaj da je izlaz broj, radi se o problemu koji se naziva \textit{regresija}, a ako je slučaj da je izlaz vrijednost iz nekog konačnog skupa podataka, onda se radi o problemu koji se naziva \textit{klasifikacija}.
 
@@ -151,7 +151,6 @@ Prije svega, postoji regresija s jednom varijablom \engl{regression with one var
 \bigskip
 
 \textit{Linearna regresija} \engl{linear regression} je tip regresije koji koristi linearnu krivulju (pravac), tj. polinom prvog stupnja kao aproksimacijsku krivulju.
-
 
 \textit{Polinomijalna regresija} \engl{polynom regression} je tip regresije koji koristi polinom reda \textit{r} kao aproksimacijsku krivulju.
 
@@ -175,7 +174,6 @@ Dakle, regresija je metoda koja se koristi za predviđanje numeričkih ishoda.
     \caption[Caption for LOF]{Primjer polinomijalne regresije sa kubnim polinomom\footnotemark}
     \label{fig:polynom-regression}
 \end{figure}
-% \footnotetext{Preuzeto iz literature \citep{cupicML}.}
 \footnotetext{Preuzeto iz literature \citep{cupicML}.}
 
 \subsection{Klasifikacija}
@@ -243,17 +241,77 @@ nije u stanju uvijek dati najbolje rezultate za proizvoljan problem nadziranog u
 \bigskip
 \bigskip
 
-U sljedećem poglavlju ćemo se detaljnije baviti algoritmom \textit{umjetna neuronska mreža}. Pogledat ćemo kako je izgledala prva neuronska mreža, koje sve mreže postoje, arhitekturu unaprijedne neuronske mreže te algoritam kojim unaprijedna neuronska mreža uči.
+U sljedećem poglavlju ćemo se detaljnije baviti algoritmom \textit{umjetna neuronska mreža}. Pogledat ćemo kako je nastao koncept umjetnog neurona, strukturu umjetnog neurona, arhitekturu unaprijedne neuronske mreže te algoritam kojim unaprijedna neuronska mreža uči.
 
 \chapter{Umjetne neuronske mreže}
+U drugom poglavlju (\textit{Pregled područja}) dotaknuli smo se razlika između simboličke umjetne inteligencije i strojnog učenja i rekli smo kako simbolička umjetna inteligencija koristi simbolički pristup, tj. sve iskaze pokušava predočiti u mnoštvo pravila pomoću ljudima čitljivim simbolima, dok se strojno učenje bavi raznim algoritmima pomoću kojih se računalni sustav uči. U ovom poglavlju bavit ćemo se algoritmom strojnog učenja koji koristi tzv. konektivistički pristup.
+
+\section{Motivacija}
+Ideja za konektivizmom \engl{connectivism} potaknuta je na temelju strukture ljudskog mozga te zbog izrazite brzine kojom mozak obrađuje podražaje. Danas je poznato da u ljudskom mozgu postoji oko 10\textsuperscript{11} neurona te 10\textsuperscript{15} međusobnih veza što znači da je svaki neuron u prosjeku povezan sa 10\textsuperscript{4} različitih veza \citep{cupicNENR}. To upravo dokazuje da mozak predstavlja jedan kompleksan i paralelan sustav zbog čega je konektivizam dobio ime te čemu algoritam umjetne neuronske mreže teži. Također, koncept ljudskog mozga nije uzet samo radi svoje izrazite brzine prilikom obrade podražaja, već i zbog činjenice da ga se može učiti na temelju velikog broja podataka koji su često ispunjeni raznim šumovima, što je realna situacija, te ga time potaknuti da razvije svojstvo generalizacije. Područje koje se bavi proučavanjem umjetnih neuronskih mreža naziva se neuro-računarstvo \engl{neuro-computing} koje je jedno od grana mekog računarstva \engl{soft-computing}.
+
+\section{Biološki neuron}
+Neuroni \engl{neurons} su glavne stanice mozga i živčanog sustava. Zadaća im je da primaju podražaje iz okoline, da prenose određene akcije od mozga prema našim mišićima i da vode računa o pretvaranju električnog potencijala između pojedinih neurona u svim koracima procesa vođenja. Neuron je izgrađen od posebne strukture koja se sastoji od: \textit{tijela stanice} (ili češće \textit{soma}), \textit{dendrita}, \textit{aksona}, i \textit{sinapse}. Struktura biološkog neurona prikazana je na slici \ref{fig:bio-neuron}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.75]{img/bio-neuron.png}
+    \caption[Caption for LOF]{Biološki neuron\footnotemark}
+    \label{fig:bio-neuron}
+\end{figure}
+\footnotetext{Preuzeto iz literature \citep{cupicANN}.}
+
+Dendriti \engl{dendrites} su ulazni dijelovi neurona, tj. strukture koje prihvaćaju inpulse od drugih neurona preko veza koje se nazivaju sinapse. Suma svih ulaznih impulsa, tj. potencijala određuje hoće li dotični neuron biti aktiviran ili ne.
+
+Aksoni \engl{axons} su izlazni dijelovi neurona, tj. strukture u kojima se generira određeni električni potencijal koji se dalje prosljeđuje sljedećem neuronu preko sinoptičkih veza.
+
+Sinapse \engl{synapses} su, kao što je rečeno ranije, veze između dendrita jednog neurona i aksona drugog neurona \citep{bioNeuron}.
+
+\section{Umjetni neuron}
+
+\subsection{Povijesni pregled}
+
+\subsubsection{MCP neuron}
+
+\textbf{1943}. dva znanstvenika, Warren McCulloch i Walter Pitts, u svojem radu \textit{A Logical Calculus of Ideas Immanent in Nervous Activity} definiraju strukturu prvog umjetnog neurona koji se u literaturi često naziva kao \textit{MCP} neuron. Na slici \ref{fig:first-ai-neuron} prikazana je struktura MCP neurona. Dendriti su predstavljeni ulazima označenih slovima \textbf{E} od riječi ekscitacijski\footnote{ekscitacija - uzbuđenje ili aktivirano stanje zbog određenog podražaja (ekscitacija. Hrvatska enciklopedija, mrežno izdanje. Leksikografski zavod Miroslav Krleža, 2020. Pristupljeno 13. 5. 2020. <http://www.enciklopedija.hr/Natuknica.aspx?ID=17398>).} \engl{excitatory} te \textbf{I} od riječi inhibicijski\footnote{inhibicija - kočenje prijenosa živčanih impulsa (inhibicija. Hrvatska enciklopedija, mrežno izdanje. Leksikografski zavod Miroslav Krleža, 2020. Pristupljeno 13. 5. 2020. <http://www.enciklopedija.hr/Natuknica.aspx?ID=27450>).} \engl{inhibitory}, tijelo stanice je predstavljeno slovom \textbf{T} od riječi prag \engl{treshold} dok je akson predstavljen izlazom koji je označen slovom \textbf{Y} bez posebnog značenja.
+
+Ekscitacijski ulazi uzrokuju da neuron postavne aktivan, tj. da se neuron "pali" \engl{fire}, dok inhibicijski ulazi uzrokuju da neuron postane neaktivan, tj. da se neuron "ne pali". Točnije, ako postoji barem jedan inhibicijski ulaz koji je aktivan, tada će neuron sigurno biti neaktivan neovisno o svim ostalim ulazima. Također, ako niti jedan od inhibicijskih ulaza nije aktivan, onda će neuron postati aktivan samo u slučaju kada je suma svih ekscitacijskih ulaza veća ili jednaka pragu, T \citep{McCullPits}. Matematički rečeno \citep{picton2000}:
+\begin{equation}
+\label{mcp:eq}
+    Y = 
+    \begin{cases}
+        1 & \text{if $\sum\limits_{i=1}^n I\textsubscript{i} = 0$ and $\sum\limits_{j=1}^m E\textsubscript{j} \geq T$} \\
+        0 & \text{otherwise.}
+    \end{cases}
+\end{equation}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics{img/first-ai-neuron.png}
+    \caption[Caption for LOF]{MCP neuron\footnotemark}
+    \label{fig:first-ai-neuron}
+\end{figure}
+\footnotetext{Preuzeto iz literature \citep{picton2000} iz poglavlje 1.4.2 Biologically inspired neural networks.}
+
+MCP neuron mogao je modelirati osnovne Booleove logičke operacije kao što su operacija \textit{i} \engl{and}, operacija \textit{ili} \engl{or} i operacija negacije \engl{not} pa se može reći da neuron predstavlja logička vrata \engl{logic gate} što je često korištena struktura prilikom konstrukcija uređaja poput računala koji mogu rješavati kompleksne logičke izraze. Shodno tomu se razvilo vjerovanje da se ljudski mozak sastoji upravo od mnoštva logičkih vrata, no nisu uzimali u obzir činjenicu da takva konstrukcija ne može biti učena te da nema svojstvo generalizacije \citep{picton2000}. 
+
+Postoji još jedna bitna stavka oko strukture MCP neurona koja je prešutno korištena, a to su vrijednosti koje poprimaju ulazi i izlazi. Vrijednosti koje mogu poprimiti su iz skupa $\{0, 1\}$ i niti jedne druge, dok vrijednost praga može biti decimalan broj. To se implicitno moglo zaključiti iz spomenutih primjena na Boolove operacije te iz formule \eqref{mcp:eq}.
+
+\subsubsection{ADALINE}
+
+
+\subsection{Perceptron}
+
+\section{Unaprijedna neuronska mreža}
+
+\section{Učenje unaprijedne neuronske mreže}
+
+\subsection{Algoritam propagacije pogreške unatrag}
 
 \chapter{Rezultati}
-Rezultati
 
 \chapter{Zaključak}
 Zaključak.
 
-\Urlmuskip=0mu plus 1mu\relax
 \bibliography{literatura}
 \bibliographystyle{fer}
 \nocite{*}
