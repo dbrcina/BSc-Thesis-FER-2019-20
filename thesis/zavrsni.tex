@@ -294,7 +294,7 @@ Ekscitacijski ulazi uzrokuju da neuron postavne aktivan, tj. da se neuron "pali"
 
 MCP neuron mogao je modelirati osnovne Booleove logičke operacije kao što su operacija \textit{i} \engl{and}, operacija \textit{ili} \engl{or} i operacija negacije \engl{not} pa se može reći da neuron predstavlja logička vrata \engl{logic gate} što je često korištena struktura prilikom konstrukcija uređaja poput računala koji mogu rješavati kompleksne logičke izraze. Shodno tomu se razvilo vjerovanje da se ljudski mozak sastoji upravo od mnoštva logičkih vrata, no nisu uzimali u obzir činjenicu da takva konstrukcija ne može biti učena te da nema svojstvo generalizacije \citep{picton2000}. 
 
-Postoji još jedna bitna stavka oko strukture MCP neurona koja je prešutno korištena, a to su vrijednosti koje poprimaju ulazi i izlaz. Vrijednosti koje mogu poprimiti su iz skupa $\{0, 1\}$ i niti jedne druge, dok vrijednost praga može biti realan broj. To se implicitno moglo zaključiti iz spomenutih primjena na Boolove operacije te iz formule \eqref{mcp:eq}.
+Postoji još jedna bitna stavka oko strukture MCP neurona koja je prešutno korištena, a to su vrijednosti koje poprimaju ulazi i izlaz. Vrijednosti koje mogu poprimiti su iz skupa $\{0, 1\}$ i niti jedne druge, dok vrijednost praga može biti realan broj. To se implicitno moglo zaključiti iz spomenutih primjena na Boolove logičke operacije te iz formule \eqref{mcp:eq}.
 
 \subsubsection{ADALINE}
 \textbf{1960.} dva znanstvenika, Bernard Widrow i Marcian E. Hoff, u svojem radu \textit{Adaptive Switching Circuits} na temelju MCP neurona definiraju jednu od prvih neuronskih mreža nazvanu \textit{ADALINE} \engl{ADAptive LINear Elements}. Na slici \ref{fig:adaline-neuron} prikazana je struktura jednog neurona iz neuronske mreže ADALINE. Dendriti su predstavljeni ulazima označenim slovom \textbf{x}, tijelo stanice predstavljeno je težinama označenim slovom \textbf{w}, a akson je predstavljen izlazom označenim slovom \textbf{y}. Dakle, uočljivo je da postoje neke novine za razliku od MCP neurona. Ulogu ekscitacijskih odnosno inhibicijskih ulaza sada imaju težine koje poprimaju vrijednosti iz realnog skupa brojeva, ulazi i izlaz poprimaju vrijednosti iz skupa $\{-1, 1\}$ i niti jedne druge, osim za ulaz \textbf{x\textsubscript{0}} čija je vrijednost uvijek 1, dok prag više nije eksplicitno zadan, već se u definiciju implicitno uključuje simbolom \textbf{w\textsubscript{0}} koji predstavlja konstantan pomak \engl{bias} \citep{picton2000}.
@@ -318,7 +318,7 @@ Vrijednost net-a je onda transformirana u izlaz \textbf{y} pomoću nelinearne fu
 
 \begin{equation}
 \label{step:eq}
-    Y = 
+    y = 
     \begin{cases}
         1, & \text{net $>0$} \\
         -1, & \text{net $\leq 0$}
@@ -333,9 +333,9 @@ Koncept težina bio je definiran 1949. kada je Donald Hebb u svome dijelu \texti
     \textit{w\textsubscript{i} = $\sum\limits_{p = 1}^p x\textsubscript{ip} * y\textsubscript{p}$}
 \end{equation}
 
-Svaka težina \textit{w\textsubscript{i}} računa se kao težinska suma svih ulaza \textit{x\textsubscript{i}} sa željenim izlazom \textit{y} i to za svaki uzorak po skupu svih uzoraka koji su označeni slovom \textit{p}. Ako uzmemo u obzir da ulazi i izlazi poprimaju vrijednosti iz skupa $\{-1, 1\}$, onda je očito da iznos težine \textit{w\textsubscript{i}} raste ako su ulaz te težine \textit{x\textsubscript{i}} i izlaz uzorka \textit{y\textsubscript{p}} aktivni odnosno smanjuje ako su neaktivni. Iako se čini da je pravilo uspješno, pokazuje se da se njime ne uspijeva dobro naučiti mreža jer se u izračun ne uzimaju stvarni izlazi neurova, već samo željeni izlazi.
+Svaka težina \textit{w\textsubscript{i}} računa se kao težinska suma svih ulaza \textit{x\textsubscript{i}} sa željenim izlazom \textit{y} i to za svaki uzorak po skupu svih uzoraka koji su označeni slovom \textit{p}. Ako uzmemo u obzir da ulazi i izlazi poprimaju vrijednosti iz skupa $\{-1, 1\}$, onda je očito da iznos težine \textit{w\textsubscript{i}} raste ako su ulaz te težine \textit{x\textsubscript{i}} i izlaz uzorka \textit{y\textsubscript{p}} aktivni odnosno smanjuje ako su neaktivni. Iako se čini da je pravilo uspješno, pokazuje se da se njime ne uspijeva dobro naučiti mrežu jer se u izračun ne uzimaju stvarni izlazi neurona, već samo željeni izlazi.
 
-Kao odgovor na navedeni nedostatak hebbovog principa, Widrow i Hoff su došli do ideje da bi se težine morale namještati pomoću pogreške \engl{error} koja se događa između željenog izlaza i stvarnog izlaza te algoritma gradijentni spust. Navedeni princip nazvan je \textit{delta pravilo} \engl{the delta rule} ili widrow-hoffovo pravilo, a danas je poznato i pod nazivom pravilo najmanjeg srednjeg kvadrata \engl{least mean square rule}. Time su uspjeli postići da mreža ADALINE pokazuje jako dobre rezultate tijekom procesa učenja \citep{picton2000}. Detaljnije definicije i izvode formula pokazat ćemo u poglavlju gdje se govori o učenju unaprijedne neuronske mreže algoritmom propagacije pogreške unatrag.
+Kao odgovor na navedeni nedostatak hebbovog principa, Widrow i Hoff su došli do ideje da bi se težine morale namještati pomoću pogreške \engl{error} koja se događa između željenog izlaza i stvarnog izlaza te algoritma gradijentni spust. Navedeni princip nazvan je \textit{delta pravilo} \engl{the delta rule} ili widrow-hoffovo pravilo, a danas je poznato i pod nazivom pravilo najmanjeg srednjeg kvadrata \engl{least mean square rule}. Time su uspjeli postići da mreža ADALINE pokazuje jako dobre rezultate tijekom procesa učenja, a to potkrepljuju riječju \engl{ADAptive} iz imena što znači prilagodljiv \citep{picton2000}. Detaljnije definicije i izvode formula pokazat ćemo u poglavlju gdje se govori o učenju unaprijedne neuronske mreže algoritmom propagacije pogreške unatrag.
 
 \subsection{Perceptron}
 
