@@ -5,16 +5,6 @@
 \usepackage{float}
 \usepackage{pdfpages}
 \usepackage{algorithm}
-\usepackage{algorithmic}
-
-\newlength\myindent
-\setlength\myindent{2em}
-\newcommand\bindent{
-  \begingroup
-  \setlength{\itemindent}{\myindent}
-  \addtolength{\algorithmicindent}{\myindent}
-}
-\newcommand\eindent{\endgroup}
 
 \begin{document}
 
@@ -249,7 +239,7 @@ U području nadziranog učenja postoji veliki broj algoritama koji uvelike prido
 \bigskip
 
 Vidimo da postoji jako velika paleta algoritama od kojih su neki složeniji od drugih, neki daju bolje rezultate od drugih, no niti jedan od algoritama
-nije u stanju uvijek dati najbolje rezultate za proizvoljan problem nadziranog učenja \citep{wiki:SUP}. Zbog navedenog vrijedi tzv. \textit{No free lunch} teorem koji nalaže da je za probleme koji zahtijevaju mnogo računalnih resursa poput pretraživanja prostora stanja i optimizacije parametara složenost u prosjeku jednaka za sve metode \citep{wiki:NFL}.
+nije u stanju uvijek dati najbolje rezultate za proizvoljan problem nadziranog učenja \citep{wiki:SUP}. Zbog navedenog vrijedi tzv. \textit{No free lunch} teorem koji nalaže da je za probleme koji zahtijevaju mnogo računalnih resursa poput pretraživanja prostora stanja i optimizacije parametara složenost\footnote{Često se ovako definirani problemi nazivaju \textit{NP}-teškim problemima \engl{Non-deterministic polynomial-time problems}.} u prosjeku jednaka za sve metode \citep{wiki:NFL}.
 
 \bigskip
 \bigskip
@@ -353,47 +343,48 @@ Zbog navedenog nedostatka hebbovog principa, Widrow i Hoff su došli do ideje da
 Glavni nedostatak ADALINE neuronske mreže je činjenica da se njome uređaji konstruiraju isključivo fizičkim putem što je puno puta nepraktično i skupo za projektirati. U narednim poglavljima reći ćemo nešto o drugačijem izvodu umjetnih neuronskih mreža pomoću računalnih programa koje je puno lakše uklopiti u električne uređaje.
 
 \subsection{Perceptron}
-\textbf{1958.} znanstvenik Frank Rosenblatt u svojem radu \textit{The perceptron: a probabilistic model for information storage and organization in the brain} na temelju MCP neurona i hebbovog principa učenja definira strukturu, perceptron\footnote{Pretpostavlja se da dolazi od latinske riječi \textit{percepcio} što u prijevodu znači razumijeti \engl{understand}.}, čija je glavna ideja da se računalnim programom pokuša konstruirati sustav koji će moći učiti na temelju danih podražaja, dakle iz iskustva. U to vrijeme je ta ideja bila suluda i izazvala je mnoge kontroverze među pionirima umjetne inteligencije. The New York Times, dnevne američke novine, te iste godine opisuju perceptron kao zametak \engl{embryo} računala koji, jednom kada se kreira i usavrši, bi predstavljao prvi računalni sustav koji bi bio u stanju opažati, prepoznati i identificirati svoju okolinu bez ljudskog osposobljavanja ili kontrole\footnote{The New York Times, \textit{Electronic 'Brain' Teacthes Itself}, stranica 9, srpanj 13, 1958.}.
-
-Struktura perceptrona je, kao što je rečeno ranije, motivirana strukturom MCP neurona. Na slici \ref{fig:ai-neuron} nalazi se prikaz umjetnog neurona koji je predstavljen kao generalizirani MCP neuron gdje je uloga ekscitacijskih, odnosno inhibicijskih ulaza zamijenjena težinama slično kao i kod ADALINE neurona. Novost u strukturi je prikaz funkcije skoka \engl{step} koja je implicitno postojala i kod izvornog MCP neurona, no ovdje je navedena eksplicitno jer se takav oblik koristi u literaturi. Također, ovakva struktura se u literaturi često naziva jednoslojni perceptron \engl{single-layer perceptron}, a kasnije ćemo se susresti i sa višeslojnim perceptronom \engl{multi-layered perceptron}.
-
-Glavna zamisao koju je Rosenblatt dokumentirao u svom radu bila je izvesti nekakvu vrstu binarnog klasifikatora\footnote{Vidi 3.2.2 Klasifikacija.} i definirati algoritam kojim bi se taj isti klasifikator uspio naučiti. Ideja algoritma je da se težine ažuriraju pomoću pogreške koja se događa između željenog izlaza i stvarnog izlaza.
+\textbf{1958.} znanstvenik Frank Rosenblatt u svojem radu \textit{The perceptron: a probabilistic model for information storage and organization in the brain} na temelju MCP neurona i hebbovog principa učenja definira strukturu, perceptron\footnote{Dolazi od latinske riječi \textit{percepcio} što u prijevodu znači razumijeti \engl{understand}.}, čija je glavna ideja da se računalnim programom pokuša konstruirati sustav koji će moći učiti na temelju danih podražaja, dakle iz iskustva. U to vrijeme je ta ideja bila suluda i izazvala je mnoge kontroverze među pionirima umjetne inteligencije. The New York Times, dnevne američke novine, te iste godine opisuju perceptron kao zametak \engl{embryo} računala koji, jednom kada se kreira i usavrši, bi predstavljao prvi računalni sustav koji bi bio u stanju opažati, prepoznati i identificirati svoju okolinu bez ljudskog osposobljavanja ili kontrole\footnote{The New York Times, \textit{Electronic 'Brain' Teacthes Itself}, stranica 9, srpanj 13, 1958.}.
 
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{img/step-neuron.png}
-    \caption[Caption for LOF]{MCP neuron\footnotemark}
+    \caption[Caption for LOF]{Perceptron\footnotemark}
     \label{fig:ai-neuron}
 \end{figure}
 \footnotetext{Izrađeno pomoću powerpoint-a i na temelju modela umjetnog neurona iz literature \citep{cupicANN}.}
 
+Struktura perceptrona je, kao što je rečeno ranije, motivirana strukturom MCP neurona. Na slici \ref{fig:ai-neuron} nalazi se prikaz perceptrona koji je predstavljen kao generalizirani MCP neuron gdje je uloga ekscitacijskih, odnosno inhibicijskih ulaza zamijenjena težinama slično kao i kod ADALINE neurona. Novost u strukturi je prikaz funkcije skoka \engl{step} koja je implicitno postojala i kod izvornog MCP neurona, no ovdje je navedena eksplicitno jer se takav oblik koristi u literaturi. Također, ovakva struktura se u literaturi često naziva jednoslojni perceptron \engl{single-layer perceptron}, a kasnije ćemo se susresti i sa višeslojnim perceptronom \engl{multi-layered perceptron}.
+
+Glavna zamisao koju je Rosenblatt dokumentirao u svom radu bila je izvesti nekakvu vrstu binarnog klasifikatora\footnote{Vidi 3.2.2 Klasifikacija.} i definirati algoritam kojim bi se taj isti klasifikator uspio naučiti \citep{rosenblatt}. Ideja algoritma je da se težine ažuriraju pomoću pogreške koja se događa između željenog izlaza i stvarnog izlaza te se onda pomnoži sa nekom konstantom koju ćemo definirati u nastavku. Pravilo učenja perceptrona dano je algoritmom \ref{algo:alg-perceptron}.
+
 \begin{algorithm}
-\caption{Pravilo učenja perceptrona}
+\caption{Pravilo učenja perceptrona\footnotemark}
 \label{algo:alg-perceptron}
-\begin{algorithmic}
-\STATE{\textbf{1:} Ciklički prolazi kroz svih \textit{N} uzoraka za učenje, jedan po jedan.}
-\STATE{\textbf{2:} Klasificiraj trenutni uzorak.}
-\bindent
-\STATE{\textbf{1:} Ako se klasificira korektno, ne mijenjaj težine i}
-\bindent\bindent
-\STATE{\textbf{1:} ako je to \textit{N}-ti}
-\STATE{\textbf{1:} Ako se klasificira korektno, ne mijenjaj težine i}
-\eindent\eindent
-\eindent
-\REPEAT
-\STATE{swapped := false}
-\STATE{n := length(A)}
-\FOR{($i := 0; i < n; inc(i)$)}
-\IF{$A_{i} > A_{i+1}$}
-\STATE{$swap(A_i, A_{i + 1})$}
-\STATE{swapped := true}
-\ENDIF
-\ENDFOR
-\STATE{$n := n - 1$}
-\UNTIL{$\lnot swapped$}
-\RETURN{A}
-\end{algorithmic}
+    \begin{enumerate}
+        \item[\textbf{1.}] Ciklički prolazi kroz svih \textit{N} uzoraka za učenje, jedan po jedan.
+        \item[\textbf{2.}] Klasificiraj trenutni uzorak.
+        \begin{enumerate}
+            \item[\textbf{1.}] Ako se klasificira korektno, ne mijenjaj težine i
+            \begin{enumerate}
+                \item[\textbf{1.}] ako je to \textit{N}-ti uzastopni uzorak klasificiran korektno, prekini učenje,
+                \item[\textbf{2.}] inače prijeđi na sljedeći uzorak.
+            \end{enumerate}
+            \item[\textbf{2.}] Ako se ne klasificira korektno, korigiraj težine perceptrona prema sljedećem izrazu: 
+            \begin{equation}
+            \label{percep:eq}
+                w\textsubscript{i}(k+1) \leftarrow w\textsubscript{i}(k) + \eta * (d-y) * x\textsubscript{i}
+            \end{equation}
+        \end{enumerate}
+    \end{enumerate}
 \end{algorithm}
+\footnotetext{Iz literature \citep{cupicANN}.}
+
+U procesu učenja klasifikatora može se uočiti da su spomenuti samo uzorci za učenje, no sada znamo i da postoji još nekoliko mehanizama koji uvelike doprinose da klasifikator razvije svojstvo generalizacije. Neki od tih mehanizama je npr. uporaba skupa za provjeru i skupa za testiranje, ali navedenim algoritmom smo htjeli pokazati elementarni proces učenja pa se time ovdje nismo htjeli zamarati. Ono što nas najviše zanima je interpretacija formule \eqref{percep:eq}. Index \textit{i} predstavlja \textit{i}-tu vrijednost, tj. \textit{w\textsubscript{i}} je \textit{i}-ta težina za \textit{i}-ti ulaz što se može vidjeti i na slici \ref{fig:ai-neuron}, \textit{k} je \textit{k}-ta iteracija procesa učenja, \textit{d} predstavlja željeni \engl{desired} izlaz neurona, dok \textit{y} predstavlja stvarni izlaz neurona te $\eta$ (eta) predstavlja parametar koji se zove stopa učenja \engl{learning rule}. To je pozitivan realan broj malog iznosa (najčešće između 0.001 i 0.5) kojim se regulira kolikom mjerom će se ažurirati trenutna težina neurona. Ako je $\eta$ jako mali broj, onda će proces učenja biti prespor, tj. težine će se mizerno malo ažurirati. Ako je $\eta$ jako veliki broj, onda će proces učenja zasigurno divergirati jer će se težine ažurirati povećim brojevima i vrijednosti će "eksplodirati". Navedeni parametar ima jako bitnu ulogu prilikom optimizacije raznih \textit{NP} teških problema koji koriste inačice algoritma gradijentni spust o kojemu će biti nešto riječi kasnije kada se dotaknemo algoritma propagacije pogreške unatrag.
+
+\bigskip
+
+Dakle, Rosenblatt je uspješno uspio iznijeti svoje teze iako su mnogi sumnjali u njih. No, mreže koje su etiketirane kao jednoslojni perceptron imaju jednu veliku manu kao i prethodno navedene ADALINE neuronske mreže, a to je činjenica da uspješno djeluju samo kada je problem linearno interpretabilan, tj. kada su izlazi dotičnih neuronskih mreža linearno odvojivi \engl{linearly separable}, a ADALINE neuronska mreža to još dodatno potvrđuje i imenom \textit{LINear Elements}. Ako se kratko vratimo na poglavlje u kojem smo govorili o tipovima klasifikacija, onda možemo vidjeti da smo problem klasifikacije podijelili na linearnu i nelinearnu klasifikaciju. Jednoslojni perceptroni su tipovi linearnih klasifikatora što znači da bi problem na slici \ref{fig:linear-classification} uspješno uspjeli klasificirati, dok problem na slici \ref{fig:non-linear-classification} ne bi jer se radi o nelinearnoj klasifikaciji. Primjeri koji se često vežu uz jednoslojne perceptrone jesu osnovne Booleove logičke operacije i, ili i negacija. Svaka od njih ima linearno interpretabilan izlaz te ih je bilo moguće realizirati. U to vrijeme je to bilo značajno otkriće, kao što je i spomenuto kod opisa primjene ADALINE neuronskih mreža. S druge strane, npr. operacija isključivo ili (XOR) nema linearno interpretabilan izlaz te se ne može realizirati jednoslojnim perceptronom kao takvim, već se mora konstruirati dvoslojni perceptron kako bi realizacija bila korektna \footnote{Zanimljivi primjeri mogu se pronaći u skripti Umjetne neuronske mreže \citep{cupicANN}.}. No, ideja o višeslojnom perceptronu je tada bila tek u procesu stvaranja jer pravilo učenja perceptrona koje je predložio Rosenblatt je djelovalo samo na jednoslojne perceptrone. 1969. Marvin L. Minsky i Seymour A. Papert u svojem djelu \textit{Perceptrons} jasno iznose nedostatke perceptrona koji je Rosenblatt definirao i to ponajviše o nemogućnostima rješavanja nelinearno odvojivih problema i učenja višeslojnih perceptrona. Time je i započela prva zima u eri umjetne inteligencije \engl{1st AI winter} kada se konektivistički pristup na kratko obustavio te se rodio simbolizam. Konektivizam će biti po strani sve negdje do 1989. kada će se po prvi put definirati algoritam kojim će višeslojni perceptron moći učiti, a to je algoritam propagacije pogreške unatrag.
+
 
 \section{Općenito o umjetnim neuronskim mrežama}
 
