@@ -4,6 +4,17 @@
 \usepackage[hidelinks]{hyperref}
 \usepackage{float}
 \usepackage{pdfpages}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+\newlength\myindent
+\setlength\myindent{2em}
+\newcommand\bindent{
+  \begingroup
+  \setlength{\itemindent}{\myindent}
+  \addtolength{\algorithmicindent}{\myindent}
+}
+\newcommand\eindent{\endgroup}
 
 \begin{document}
 
@@ -339,8 +350,50 @@ Svaka težina \textit{w\textsubscript{i}} računa se kao težinska suma svih ula
 
 Zbog navedenog nedostatka hebbovog principa, Widrow i Hoff su došli do ideje da bi se težine morale namještati pomoću pogreške \engl{error} koja se događa između željenog izlaza i stvarnog izlaza te algoritma gradijentni spust. Navedeni princip nazvan je: \textit{delta pravilo} \engl{the delta rule} ili widrow-hoffovo pravilo, a danas je poznato i pod nazivom: pravilo najmanjeg srednjeg kvadrata \engl{least mean square rule}. Time su uspjeli postići da mreža ADALINE pokazuje jako dobre rezultate tijekom procesa učenja, a to se implicitno potkrepljuje riječju \engl{ADAptive} iz imena što znači prilagodljiv \citep{picton2000}. Detaljnije definicije i izvode formula pokazat ćemo u poglavlju gdje se govori o učenju unaprijedne neuronske mreže algoritmom propagacije pogreške unatrag.
 
+Glavni nedostatak ADALINE neuronske mreže je činjenica da se njome uređaji konstruiraju isključivo fizičkim putem što je puno puta nepraktično i skupo za projektirati. U narednim poglavljima reći ćemo nešto o drugačijem izvodu umjetnih neuronskih mreža pomoću računalnih programa koje je puno lakše uklopiti u električne uređaje.
+
 \subsection{Perceptron}
-\textbf{1958.} znanstvenik Frank Rosenblatt u svojem radu \textit{The perceptron: a probabilistic model for information storage and organization in the brain} na temelju MPC neurona i hebbovog principa učenja definira pojam perceptron \engl{perceptron}.
+\textbf{1958.} znanstvenik Frank Rosenblatt u svojem radu \textit{The perceptron: a probabilistic model for information storage and organization in the brain} na temelju MCP neurona i hebbovog principa učenja definira strukturu, perceptron\footnote{Pretpostavlja se da dolazi od latinske riječi \textit{percepcio} što u prijevodu znači razumijeti \engl{understand}.}, čija je glavna ideja da se računalnim programom pokuša konstruirati sustav koji će moći učiti na temelju danih podražaja, dakle iz iskustva. U to vrijeme je ta ideja bila suluda i izazvala je mnoge kontroverze među pionirima umjetne inteligencije. The New York Times, dnevne američke novine, te iste godine opisuju perceptron kao zametak \engl{embryo} računala koji, jednom kada se kreira i usavrši, bi predstavljao prvi računalni sustav koji bi bio u stanju opažati, prepoznati i identificirati svoju okolinu bez ljudskog osposobljavanja ili kontrole\footnote{The New York Times, \textit{Electronic 'Brain' Teacthes Itself}, stranica 9, srpanj 13, 1958.}.
+
+Struktura perceptrona je, kao što je rečeno ranije, motivirana strukturom MCP neurona. Na slici \ref{fig:ai-neuron} nalazi se prikaz umjetnog neurona koji je predstavljen kao generalizirani MCP neuron gdje je uloga ekscitacijskih, odnosno inhibicijskih ulaza zamijenjena težinama slično kao i kod ADALINE neurona. Novost u strukturi je prikaz funkcije skoka \engl{step} koja je implicitno postojala i kod izvornog MCP neurona, no ovdje je navedena eksplicitno jer se takav oblik koristi u literaturi. Također, ovakva struktura se u literaturi često naziva jednoslojni perceptron \engl{single-layer perceptron}, a kasnije ćemo se susresti i sa višeslojnim perceptronom \engl{multi-layered perceptron}.
+
+Glavna zamisao koju je Rosenblatt dokumentirao u svom radu bila je izvesti nekakvu vrstu binarnog klasifikatora\footnote{Vidi 3.2.2 Klasifikacija.} i definirati algoritam kojim bi se taj isti klasifikator uspio naučiti. Ideja algoritma je da se težine ažuriraju pomoću pogreške koja se događa između željenog izlaza i stvarnog izlaza.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{img/step-neuron.png}
+    \caption[Caption for LOF]{MCP neuron\footnotemark}
+    \label{fig:ai-neuron}
+\end{figure}
+\footnotetext{Izrađeno pomoću powerpoint-a i na temelju modela umjetnog neurona iz literature \citep{cupicANN}.}
+
+\begin{algorithm}
+\caption{Pravilo učenja perceptrona}
+\label{algo:alg-perceptron}
+\begin{algorithmic}
+\STATE{\textbf{1:} Ciklički prolazi kroz svih \textit{N} uzoraka za učenje, jedan po jedan.}
+\STATE{\textbf{2:} Klasificiraj trenutni uzorak.}
+\bindent
+\STATE{\textbf{1:} Ako se klasificira korektno, ne mijenjaj težine i}
+\bindent\bindent
+\STATE{\textbf{1:} ako je to \textit{N}-ti}
+\STATE{\textbf{1:} Ako se klasificira korektno, ne mijenjaj težine i}
+\eindent\eindent
+\eindent
+\REPEAT
+\STATE{swapped := false}
+\STATE{n := length(A)}
+\FOR{($i := 0; i < n; inc(i)$)}
+\IF{$A_{i} > A_{i+1}$}
+\STATE{$swap(A_i, A_{i + 1})$}
+\STATE{swapped := true}
+\ENDIF
+\ENDFOR
+\STATE{$n := n - 1$}
+\UNTIL{$\lnot swapped$}
+\RETURN{A}
+\end{algorithmic}
+\end{algorithm}
 
 \section{Općenito o umjetnim neuronskim mrežama}
 
