@@ -221,6 +221,7 @@ public class Window extends JFrame {
         btnTrain.addActionListener(evt -> {
             int[] hiddenLayers = Arrays.stream(fldHiddenLayers.getText().split(","))
                     .mapToInt(Integer::parseInt)
+                    .filter(i -> i > 0)
                     .toArray();
             int[] layers = new int[1 + hiddenLayers.length + 1];
             // input layer
