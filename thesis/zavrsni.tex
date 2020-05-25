@@ -348,7 +348,7 @@ Glavni nedostatak ADALINE neuronske mreže je činjenica da se njome uređaji ko
 \begin{figure}[H]
     \centering
     \includegraphics[scale=0.5]{img/step-neuron.png}
-    \caption[Caption for LOF]{Perceptron\footnotemark}
+    \caption[Caption for LOF]{Umjetni neuron perceptron-a\footnotemark}
     \label{fig:ai-neuron}
 \end{figure}
 \footnotetext{Izrađeno pomoću powerpoint-a i na temelju modela umjetnog neurona iz literature \citep{cupicANN}.}
@@ -385,10 +385,32 @@ U procesu učenja klasifikatora može se uočiti da su spomenuti samo uzorci za 
 
 Dakle, Rosenblatt je uspješno uspio iznijeti svoje teze iako su mnogi sumnjali u njih. No, mreže koje su etiketirane kao jednoslojni perceptron imaju jednu veliku manu kao i prethodno navedene ADALINE neuronske mreže, a to je činjenica da uspješno djeluju samo kada je problem linearno interpretabilan, tj. kada su izlazi dotičnih neuronskih mreža linearno odvojivi \engl{linearly separable}, a ADALINE neuronska mreža to još dodatno potvrđuje i imenom \textit{LINear Elements}. Ako se kratko vratimo na poglavlje u kojem smo govorili o tipovima klasifikacija, onda možemo vidjeti da smo problem klasifikacije podijelili na linearnu i nelinearnu klasifikaciju. Jednoslojni perceptroni su tipovi linearnih klasifikatora što znači da bi problem na slici \ref{fig:linear-classification} uspješno uspjeli klasificirati, dok problem na slici \ref{fig:non-linear-classification} ne bi jer se radi o nelinearnoj klasifikaciji. Primjeri koji se često vežu uz jednoslojne perceptrone jesu osnovne Booleove logičke operacije i, ili i negacija. Svaka od njih ima linearno interpretabilan izlaz te ih je bilo moguće realizirati. U to vrijeme je to bilo značajno otkriće, kao što je i spomenuto kod opisa primjene ADALINE neuronskih mreža. S druge strane, npr. operacija isključivo ili (XOR) nema linearno interpretabilan izlaz te se ne može realizirati jednoslojnim perceptronom kao takvim, već se mora konstruirati dvoslojni perceptron kako bi realizacija bila korektna \footnote{Zanimljivi primjeri mogu se pronaći u skripti Umjetne neuronske mreže \citep{cupicANN}.}. No, ideja o višeslojnom perceptronu je tada bila tek u procesu stvaranja jer pravilo učenja perceptrona koje je predložio Rosenblatt je djelovalo samo na jednoslojne perceptrone. 1969. Marvin L. Minsky i Seymour A. Papert u svojem djelu \textit{Perceptrons} jasno iznose nedostatke perceptrona koji je Rosenblatt definirao i to ponajviše o nemogućnostima rješavanja nelinearno odvojivih problema i učenja višeslojnih perceptrona. Time je i započela prva zima u eri umjetne inteligencije \engl{1st AI winter} kada se konektivistički pristup na kratko obustavio te se rodio simbolizam. Konektivizam će biti po strani sve negdje do 1989. kada će se po prvi put definirati algoritam kojim će višeslojni perceptron moći učiti, a to je algoritam propagacije pogreške unatrag.
 
-
 \section{Općenito o umjetnim neuronskim mrežama}
+Do sada smo se upoznali sa modelom umjetnog neurona i prvim modelima neuronskih mreža, ADALINE i perceptron i vidjeli smo razne nedostatke koji isti sadrže. Mali broj neurona može davati dosta uspješne rezultate, no ograničeni su na jako jednostavne i  specifične probleme kao npr. konstrukcija jednostavnih Booleovh logičkih operacija što smo spomenuli ranije. Ljudski mozak je evidentno puno kompleksniji od strukture par neurona te se time došlo na ideju povezati veliki broj neurona u jednu veliku strukturu, tj. algoritam koji će biti vjerni prikaz ljudskog mozga, a takav algoritam je nazvan umjetna neuronska mreža. Na slici \ref{fig:ann} je prikazana tipična građa jedne unaprijedne višeslojne potpuno povezane umjetne neuronske mreže.
 
-\section{Unaprijedna neuronska mreža}
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/ann.png}
+    \caption[Caption for LOF]{Tipična građa umjetne neuronske mreže\footnotemark}
+    \label{fig:ann}
+\end{figure}
+\footnotetext{Izrađeno pomoću powerpoint-a i na temelju modela umjetne neuronske mreže iz literature \citep{cupicNENR}.}
+
+Dakle, mreža se sastoji od tri različite vrste slojeva: ulazni, skriveni i izlazni sloj. Ulazni sloj je sloj na koji se dovode uzorci za koje želimo da mreža nešto napravi i ulazi su prikazani slovom \textbf{X}. Izlazni sloj je sloj na kojemu će se nalaziti izlazi za navedeni uzorak u ulaznom sloju i prikazani su slovom \textbf{Y}. Skriveni sloj je sloj koji jedini nije vidljiv izvana i u kojemu se sva logika umjetne neuronske mreže događa. Neuroni skrivenog sloja označeni su slovom \textbf{H} i broj slojeva koji se nalaze u skrivenom sloju može biti proizvoljan. Primjetite koji se indeksi koriste kod enumeracije svakog od slojeva. U ulaznom sloju neuronska mreža očekuje \textit{N} ulaza, u izlaznom sloju se očekuje \textit{M} izlaza, dok u skrivenom sloju broj neurona može varirati po sloju, stoga su korišteni proizvoljni indeksi označeni slovima \textbf{K} i \textbf{O}.
+
+U navedenoj strukturi pretpostavili smo da je svaki neuron nekog sloja povezan sa svakim neuronom njemu sljedećeg sloja i to samo tog sloja, osim izlaznog sloja koji je posljednji sloj neuronske mreže. Takve mreže ćemo nazivati slojevitim potpuno povezanim mrežama i njihova je zadaća da za neki fiksan ulaz generiraju neki stabilan izlaz \citep{cupicNENR}. U matematičkom smislu navedena operacija naziva se preslikavanje i to je glavna tema ovog rada kojoj ćemo se uskoro posvetiti detaljnije. Međutim, postoje i različite vrste mreža koje ne moraju biti niti slojevite niti potpuno povezane, a mogu imati i cikluse. Kod takvih mreža neuroni mogu biti povezani i sa neuronima prethodnog sloja te se time postiže da neuronske mreže budu promjenjive kroz vrijeme i da imaju mogućnost čuvanja nekog određenog stanja, tj. možemo reći da razvijaju nekakvu vrstu memorije. Na slici \ref{fig:cyclic-ann} je prikazana struktura jedne cikličke umjetne neuronske mreže koja je gotovo identična kao i na slici \ref{fig:ann}, no dodana je jedna povratna veza kojom se cijela ideja mreže mijenja.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/cycle-ann.png}
+    \caption[Caption for LOF]{Tipična građa cikličke umjetne neuronske mreže\footnotemark}
+    \label{fig:cyclic-ann}
+\end{figure}
+\footnotetext{Izrađeno pomoću powerpoint-a i na temelju modela umjetne neuronske mreže iz literature \citep{cupicANN}.}
+
+Često spominjemo sintagme poput struktura ili građa umjetne neuronske mreže, no u raznim literaturama koristi se sintagma arhitektura umjetne neuronske mreže pa ćemo i mi ubuduće koristiti upravo takav opis. Arhitektura umjetne neuronske mreže definira se na sljedeći način: uvijek započinje brojem neurona ulaznog sloja, zatim se definiraju skriveni slojevi i to svaki sloj je predstavljen brojem neurona tog sloja i na kraju se nalazi broj neurona izlaznog sloja. Npr. jedna od arhitektura mogla bi biti 2x5x4x3 i nju tumačimo na sljedeći način: mreža se sastoji od četiri sloja; ulaznog, dva skrivena i izlaznog. Ulazni sloj sastavljen je od 2 neurona, prvi skriveni sloj je sastavljen od 5 neurona, drugi skriveni sloj je sastavljen od 4 neurona i izlazni sloj je sastavljen od 3 neurona. Onda bi npr. jednu inačicu rosenblattovog perceptrona mogli definirati kao 3x1 jer on ne sadrži niti jedan skriveni sloj. Kasnije ćemo pogledati na koji način različite arhitekture utječu na uspješnost jedne unaprijedne neuronske mreže tijekom problema klasifikacije.
+
+\subsection{Unaprijedna neuronska mreža}
 
 \section{Učenje unaprijedne neuronske mreže}
 
