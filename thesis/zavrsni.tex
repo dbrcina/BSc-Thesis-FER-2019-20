@@ -232,7 +232,7 @@ Na slikama \ref{fig:linear-classification} i \ref{fig:non-linear-classification}
 U području nadziranog učenja postoji veliki broj algoritama koji uvelike pridonose boljem učenju. Neki od poznatijih su:
 
 \begin{itemize}
-    \item Stroj za podršku vektorima \engl{support-vector machine, SVM},
+    \item Stroj potpornih vektora \engl{support-vector machine, SVM},
     \item Stabla odluke \engl{decision trees},
     \item Naivni Bayesov klasifikator \engl{naive Bayes classifier},
     \item Slučajne šume \engl{random forests},
@@ -387,7 +387,7 @@ U procesu učenja klasifikatora može se uočiti da su spomenuti samo uzorci za 
 
 \bigskip
 
-Dakle, Rosenblatt je uspješno uspio iznijeti svoje teze iako su mnogi sumnjali u njih. No, mreže koje su etiketirane kao jednoslojni perceptron imaju jednu veliku manu kao i prethodno navedene ADALINE neuronske mreže, a to je činjenica da uspješno djeluju samo kada je problem linearno interpretabilan, tj. kada su izlazi dotičnih neuronskih mreža linearno odvojivi \engl{linearly separable}, a ADALINE neuronska mreža to još dodatno potvrđuje i imenom \textit{LINear Elements}. Ako se kratko vratimo na poglavlje u kojem smo govorili o tipovima klasifikacija, onda možemo vidjeti da smo problem klasifikacije podijelili na linearnu i nelinearnu klasifikaciju. Jednoslojni perceptroni su tipovi linearnih klasifikatora što znači da bi problem na slici \ref{fig:linear-classification} uspješno uspjeli klasificirati, dok problem na slici \ref{fig:non-linear-classification} ne bi jer se radi o nelinearnoj klasifikaciji. Primjeri koji se često vežu uz jednoslojne perceptrone jesu osnovne Booleove logičke operacije i, ili i negacija. Svaka od njih ima linearno interpretabilan izlaz te ih je bilo moguće realizirati. U to vrijeme je to bilo značajno otkriće, kao što je i spomenuto kod opisa primjene ADALINE neuronskih mreža. S druge strane, npr. operacija isključivo ili (XOR) nema linearno interpretabilan izlaz te se ne može realizirati jednoslojnim perceptronom kao takvim, već se mora konstruirati dvoslojni perceptron kako bi realizacija bila korektna \footnote{Zanimljivi primjeri mogu se pronaći u skripti Umjetne neuronske mreže \citep{cupicANN}.}. No, ideja o višeslojnom perceptronu je tada bila tek u procesu stvaranja jer pravilo učenja perceptrona koje je predložio Rosenblatt je djelovalo samo na jednoslojne perceptrone. 1969. Marvin L. Minsky i Seymour A. Papert u svojem djelu \textit{Perceptrons} jasno iznose nedostatke perceptrona koji je Rosenblatt definirao i to ponajviše o nemogućnostima rješavanja nelinearno odvojivih problema i učenja višeslojnih perceptrona. Time je i započela prva zima u eri umjetne inteligencije \engl{1st AI winter} kada se konektivistički pristup na kratko obustavio te se rodio simbolizam. Konektivizam će biti po strani sve negdje do 1989. kada će se po prvi put definirati algoritam kojim će višeslojni perceptron moći učiti, a to je algoritam propagacije pogreške unatrag.
+Dakle, Rosenblatt je uspješno uspio iznijeti svoje teze iako su mnogi sumnjali u njih. No, mreže koje su etiketirane kao jednoslojni perceptron imaju jednu veliku manu kao i prethodno navedene ADALINE neuronske mreže, a to je činjenica da uspješno djeluju samo kada je problem linearno interpretabilan, tj. kada su izlazi dotičnih neuronskih mreža linearno odvojivi \engl{linearly separable}, a ADALINE neuronska mreža to još dodatno potvrđuje i imenom \textit{LINear Elements}. Ako se kratko vratimo na poglavlje u kojem smo govorili o tipovima klasifikacija, onda možemo vidjeti da smo problem klasifikacije podijelili na linearnu i nelinearnu klasifikaciju. Jednoslojni perceptroni su tipovi linearnih klasifikatora što znači da bi problem na slici \ref{fig:linear-classification} uspješno uspjeli klasificirati, dok problem na slici \ref{fig:non-linear-classification} ne bi jer se radi o nelinearnoj klasifikaciji. Primjeri koji se često vežu uz jednoslojne perceptrone jesu osnovne Booleove logičke operacije i, ili i negacija. Svaka od njih ima linearno interpretabilan izlaz te ih je bilo moguće realizirati. U to vrijeme je to bilo značajno otkriće, kao što je i spomenuto kod opisa primjene ADALINE neuronskih mreža. S druge strane, npr. operacija isključivo ili (XOR) nema linearno interpretabilan izlaz te se ne može realizirati jednoslojnim perceptronom kao takvim, već se mora konstruirati dvoslojni perceptron kako bi realizacija bila korektna \footnote{Zanimljivi primjeri mogu se pronaći u skripti Umjetne neuronske mreže \citep{cupicANN}.}. No, ideja o višeslojnom perceptronu je tada bila tek u procesu stvaranja jer pravilo učenja perceptrona koje je predložio Rosenblatt je djelovalo samo na jednoslojne perceptrone. 1969. Marvin L. Minsky i Seymour A. Papert u svojem djelu \textit{Perceptrons} jasno iznose nedostatke perceptrona koji je Rosenblatt definirao i to ponajviše o nemogućnostima rješavanja nelinearno odvojivih problema i učenja višeslojnih perceptrona. Time je i započela prva zima u eri umjetne inteligencije \engl{1st AI winter} kada se konektivistički pristup na kratko obustavio te se rodio simbolizam. Konektivizam će biti po strani sve negdje do 1986. kada će se po prvi put definirati algoritam kojim će višeslojni perceptron moći učiti, a to je algoritam propagacije pogreške unatrag.
 
 \section{Općenito o umjetnim neuronskim mrežama}
 Do sada smo se upoznali sa modelom umjetnog neurona i prvim modelima neuronskih mreža, ADALINE i perceptron i vidjeli smo razne nedostatke koji isti sadrže. Mali broj neurona može davati dosta uspješne rezultate, no ograničeni su na jako jednostavne i  specifične probleme kao npr. konstrukcija jednostavnih Booleovh logičkih operacija što smo spomenuli ranije. Ljudski mozak je evidentno puno kompleksniji od strukture par neurona te se time došlo na ideju povezati veliki broj neurona u jednu veliku strukturu, tj. algoritam koji će biti vjerni prikaz ljudskog mozga, a takav algoritam je nazvan umjetna neuronska mreža. Na slici \ref{fig:ann} je prikazana tipična građa jedne unaprijedne višeslojne potpuno povezane umjetne neuronske mreže.
@@ -655,14 +655,46 @@ Nelinearne aktivacijske funkcije su najčešće korištene funkcije kada se radi
 Do sada smo definirali kako za neke ulaze dobiti nekakvu vrstu izlaza koji će biti u rasponu određenom nekom od navedenih aktivacijskih funkcija, no nigdje nismo rekli kakvi ti ulazi trebaju biti. Kojem rasponu brojeva trebaju pripadati? Koje početne vrijednosti trebaju imati težine svih slojeva? Odgovore na ta pitanja ćemo sada pokušati odgovoriti.
 
 \subsubsection{Normalizacija}
-Normalizacija \engl{normalization} je postupak kojim se vrijednosti nekih podataka adaptiraju na neki fiksni interval kao npr. na interval $(0, 1)$. To je potrebno napraviti prventstveno jer je tako računalu znatno jednostavnije izvoditi operacije s matricama, a i najčešće na izlazima očekujemo vrijednosti između -1 i 1 pa ako su ulazne vrijednosti puno veće od navedenog, onda mreža vrlo vjerojatno neće dobro naučiti ili će se mučiti pronađe prave težine.
+Normalizacija \engl{normalization} je postupak kojim se vrijednosti nekih podataka adaptiraju na neki fiksni interval kao npr. na interval $(0, 1)$. To je potrebno napraviti prventstveno jer je tako računalu znatno jednostavnije izvoditi operacije s matricama, a i najčešće na izlazima očekujemo vrijednosti između -1 i 1 pa ako su ulazne vrijednosti puno veće od navedenog, onda mreža vrlo vjerojatno neće dobro naučiti ili će se mučiti pronađe prave težine. U implementaciji je korišten tip normalizacije u kojoj stvarnu vrijednost ulaza podijelimo maksimalnom mogućom vrijednosti za ulaz. Npr. točka koja ima ekranske koordinate x i y će se normalizirati na način da ćemo x koordinatu podijeliti širinom prozora, dok ćemo y koordinatu podijeliti visinom prozora.
 
 \subsubsection{Inicijalizacija}
 Inicijalizacija \engl{initialization} težina igra još veću ulogu u učenju unaprijedne neuronske mreže od normalizacije ulaza. Zašto nam je uopće potrebna inicijalizacija težina? Pretpostavimo da su sve težine inicijalno postavljene na 0. U tom slučaju će svi neuroni biti simetrični i naučit će značajke te zbog toga učenje neće biti moguće. Općenito, bilo kakva inicijalizacija nekom konstantom će rezultirati istim rezultatom. Što će se dogoditi ako težine inicijaliziramo jako velikim, odnosno jako malim brojevima? Ako provedemo takvu inicijalizaciju, dogodit će se problem kojeg nazivamo eksplodirajući, odnosno iščezavajući gradijent. Ako nastupi eksplodirajući gradijent, tada će učenje unaprijedne neuronske mreže drastično divergirati, dok će kod iščezavajućeg gradijenta učenje biti izrazito sporo. Zbog navedenih razloga je vrlo jasno da se težine moraju kvalitetno inicijalizirati. Postoje mnoge metode inicijalizacije, no spomenut ćemo samo onu koja je korištena u implementaciji, a to je Xavier inicijalizacija koja vrijednosti težina generira normalnom razdiobom gdje očekivanje, $\mu$, iznosi 0, a standardna devijacija, $\sigma$, iznosi $\sqrt{\frac{1}{n\textsuperscript{(l-1)}}}$. Nazivnik predstavlja broj neurona u prijašnjem sloju \citep{init}.
 
 \section{Učenje unaprijedne neuronske mreže}
+U ovom trenutku trebali bismo biti upoznati sa općenitim načinom rada unaprijedne neuronske mreže, a to je aproksimacija, odnosno predikcija nekog izlaza za neki proizvoljan ulaz. Upoznali smo se i sa normalizacijom ulaznih podataka, inicijalizacijom težina među neuronima i prikazali smo matematičku interpretaciju svega navedenog. Ostalo nam je još objasniti kako se unaprijedna neuronska mreža uči i to ćemo objasniti u ovom poglavlju.
+
+Unaprijedna neuronska mreža može se učiti na nekoliko načina, a najpoznatiji su učenje algoritmima evolucijskog računanja i učenje algoritmom gradijenti spust i algoritmom propagacije pogreške unatrag. U ovom radu fokus je bio na zadnja dva.
+
+\bigskip
+
+Prije nego što krenemo na algoritam propagacije pogreške unatrag, prisjetimo se kratko koja je temeljna ideja algoritma gradijentni spust.
+
+\subsection{Gradijentni spust}
+Gradijentni spust \engl{gradient descent} je algoritam koji se koristi za minimizaciju funkcija preko njihovih derivacije. Pretpostavimo da postoji funkcija $f(x)$ koju želimo minimizirati. Tada ćemo x za koji je funkcija f minimalna tražiti sljedećom formulom:
+
+\begin{equation}
+    \label{eq:grad}
+    x \leftarrow x - \alpha * \frac{\partial}{\partial x}f(x)
+\end{equation}
+
+pri čemu je $\alpha$ stopa učenja koja je često mali realan broj. Dan je primjer funkcije sa jednom varijablom, no algoritam djeluje i na funkcije s više varijabli. Glavna ideja algoritma je da se po grafu pomičemo u smjeru koji pokazuje na točku gdje će derivacija biti približno jednaka 0, a brzinu kretanja određuje stopa učenja koju smo obradili nešto ranije.
 
 \subsection{Algoritam propagacije pogreške unatrag}
+Algoritam propagacije pogreške unatrag \engl{backpropagation algorithm} je trenutno možda najkorišteniji algoritam učenja unaprijedne neuronske mreže. 1986. Rumelhart zajedno sa dvojicom prijatelja u djelu \textit{Parallel Distributed Processing} po prvi put definira termin \textit{backpropagation} i učenje višeslojnog perceptrona. Oko te godine konektivistički pristup ponovno dobiva zalet i prva zima umjetne inteligencije polako prolazi. U ovom radu nećemo ulazi u detalje izvoda samog algoritma, već ćemo dati općeniti pregled gotovih formula, pseudokod algoritma te neke od inačica. Sve notacije koje smo uveli kod definicije unaprijedne neuronske mreže će vrijediti i ovdje.
+
+Pretpostavimo da imamo skup uzoraka koji se sastoji od \textit{N} različitih uzoraka. Svaki uzorak je predstavljen vektorom ulaza i vektorom očekivanih izlaza i označimo ga kao $(x\textsubscript{s,1}, x\textsubscript{s,2},\dots, x\textsubscript{s,n}) \xrightarrow{} (d\textsubscript{s,1}, d\textsubscript{s,2},\dots, d\textsubscript{s,m})$, gdje su ulazi označeni slovom \textbf{x}, a željeni izlazi slovom \textbf{d}. Indeks \textit{s} predstavlja \textit{s}-ti uzorak, a \textit{n} i \textit{m} broj neurona na ulazu, odnosno na izlazu neuronske mreže\footnote{Pogledaj sliku \ref{fig:ann}.}. Također, pretpostavimo da je mreža sastavljena od \textit{L} slojeva gdje je \textit{L}-ti sloj izlazni sloj. Da bi mreža mogla učiti, moramo definirati određenu funkciju kazne pomoću koje će mreža dobiti povratnu informaciju o tome koliko dobro ili loše uči te na temelju te pogreške korigirati iznose težina. Funkcija kazne za jedan uzorak definirana je na sljedeći način:
+
+\begin{equation}
+    \label{eq:sample-err}
+    E(s) = \frac{1}{2}\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})^2.
+\end{equation}
+
+S obzirom da nam je cilj učiti nad cijelim skupom uzoraka, onda je potrebno definirati funkciju kazne za cijeli skup:
+
+\begin{equation}
+    \label{eq:err}
+    E = \frac{1}{N}\sum\limits_{s=1}^NE(s) = \frac{1}{2\cdot{N}}\sum\limits_{s=1}^N\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})^2.
+\end{equation}
 
 \section{Primjena umjetnih neuronskih mreža}
 
@@ -673,7 +705,6 @@ Zaključak.
 
 \bibliography{literatura}
 \bibliographystyle{fer}
-\nocite{*}
 
 \begin{sazetak}
 Sažetak na hrvatskom jeziku.
