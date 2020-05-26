@@ -402,7 +402,7 @@ Do sada smo se upoznali sa modelom umjetnog neurona i prvim modelima neuronskih 
 
 Dakle, mreža se sastoji od tri različite vrste slojeva: ulazni, skriveni i izlazni sloj. Ulazni sloj je sloj na koji se dovode uzorci za koje želimo da mreža nešto napravi i ulazi su prikazani slovom \textbf{x}. Izlazni sloj je sloj na kojemu će se nalaziti izlazi za navedeni uzorak u ulaznom sloju i prikazani su slovom \textbf{y}. Skriveni sloj je sloj koji jedini nije vidljiv izvana i u kojemu se sva logika umjetne neuronske mreže događa. Neuroni skrivenog sloja označeni su slovom \textbf{h} i broj slojeva koji se nalaze u skrivenom sloju može biti proizvoljan. Primjetite koji se indeksi koriste kod enumeracije svakog od slojeva. U ulaznom sloju neuronska mreža očekuje \textit{n} ulaza, u izlaznom sloju se očekuje \textit{m} izlaza, dok u skrivenom sloju broj neurona može varirati po sloju, stoga su korišteni proizvoljni indeksi označeni slovima \textbf{k} i \textbf{o}.
 
-U navedenoj strukturi pretpostavili smo da je svaki neuron nekog sloja povezan sa svakim neuronom njemu sljedećeg sloja i to samo tog sloja, osim izlaznog sloja koji je posljednji sloj neuronske mreže. Takve mreže ćemo nazivati slojevitim potpuno povezanim mrežama i njihova je zadaća da za neki fiksan ulaz generiraju neki stabilan izlaz \citep{cupicNENR}. U matematičkom smislu navedena operacija naziva se preslikavanje i to je glavna tema ovog rada kojoj ćemo se uskoro posvetiti detaljnije. Međutim, postoje i različite vrste mreža koje ne moraju biti niti slojevite niti potpuno povezane, a mogu imati i cikluse. Kod takvih mreža neuroni mogu biti povezani i sa neuronima prethodnog sloja te se time postiže da neuronske mreže budu promjenjive kroz vrijeme i da imaju mogućnost čuvanja nekog određenog stanja, tj. možemo reći da razvijaju nekakvu vrstu memorije. Na slici \ref{fig:cyclic-ann} je prikazana struktura jedne cikličke umjetne neuronske mreže koja je gotovo identična kao i na slici \ref{fig:ann}, no dodana je jedna povratna veza kojom se cijela ideja mreže mijenja.
+U navedenoj strukturi pretpostavili smo da je svaki neuron nekog sloja povezan sa svakim neuronom njemu sljedećeg sloja i to samo tog sloja, osim izlaznog sloja koji je posljednji sloj neuronske mreže. Takve mreže ćemo nazivati slojevitim potpuno povezanim mrežama i njihova je zadaća da za neki fiksan ulaz generiraju neki stabilan izlaz \citep{cupicNENR}. U matematičkom smislu navedena operacija naziva se preslikavanje i to je glavna tema ovog rada kojoj ćemo se uskoro posvetiti detaljnije. Međutim, postoje i različite vrste mreža koje ne moraju biti niti slojevite niti potpuno povezane, a mogu imati i cikluse. Kod takvih mreža neuroni mogu biti povezani i sa neuronima prethodnog sloja te se time postiže da neuronske mreže budu promjenjive kroz vrijeme i da imaju mogućnost čuvanja nekog određenog stanja, tj. možemo reći da razvijaju nekakvu vrstu memorije. Na slici \ref{fig:cyclic-ann} je prikazana struktura jedne cikličke umjetne neuronske mreže koja je gotovo identična neuronskoj mreži na slici \ref{fig:ann}, no dodana je jedna povratna veza kojom se cijela ideja mreže mijenja.
 
 \begin{figure}[H]
     \centering
@@ -412,14 +412,14 @@ U navedenoj strukturi pretpostavili smo da je svaki neuron nekog sloja povezan s
 \end{figure}
 \footnotetext{Izrađeno pomoću powerpoint-a i na temelju modela umjetne neuronske mreže iz literature \citep{cupicANN}.}
 
-Često spominjemo sintagme poput struktura ili građa umjetne neuronske mreže, no u raznim literaturama koristi se sintagma arhitektura umjetne neuronske mreže pa ćemo i mi ubuduće koristiti upravo takav opis. Arhitektura umjetne neuronske mreže definira se na sljedeći način: uvijek započinje brojem neurona ulaznog sloja, zatim se definiraju skriveni slojevi i to svaki sloj je predstavljen brojem neurona tog sloja i na kraju se nalazi broj neurona izlaznog sloja. Npr. jedna od arhitektura mogla bi biti 2x5x4x3 i nju tumačimo na sljedeći način: mreža se sastoji od četiri sloja; ulaznog, dva skrivena i izlaznog. Ulazni sloj sastavljen je od 2 neurona, prvi skriveni sloj je sastavljen od 5 neurona, drugi skriveni sloj je sastavljen od 4 neurona i izlazni sloj je sastavljen od 3 neurona. Onda bi npr. jednu inačicu rosenblattovog perceptrona mogli definirati kao 3x1 jer on ne sadrži niti jedan skriveni sloj. Kasnije ćemo pogledati na koji način različite arhitekture utječu na uspješnost jedne unaprijedne neuronske mreže tijekom problema klasifikacije.
+Često spominjemo sintagme poput struktura ili građa umjetne neuronske mreže, no u raznim literaturama koristi se sintagma arhitektura umjetne neuronske mreže pa ćemo i mi ubuduće koristiti upravo takav opis. Arhitektura umjetne neuronske mreže definira se na sljedeći način: uvijek započinje brojem neurona ulaznog sloja, zatim se definiraju skriveni slojevi i to svaki sloj je predstavljen brojem neurona tog sloja i na kraju se nalazi broj neurona izlaznog sloja. Npr. jedna od arhitektura mogla bi biti 2x5x4x3 i nju tumačimo na sljedeći način: mreža se sastoji od četiri sloja; ulaznog, dva skrivena i izlaznog. Ulazni sloj sastavljen je od 2 neurona, prvi skriveni sloj je sastavljen od 5 neurona, drugi skriveni sloj je sastavljen od 4 neurona i izlazni sloj je sastavljen od 3 neurona. Onda bi npr. jednu inačicu rosenblattovog perceptrona mogli definirati kao 3x1 jer on ne sadrži niti jedan skriveni sloj. Kasnije ćemo pogledati na koji način različite arhitekture utječu na uspješnost jedne unaprijedne neuronske mreže tijekom učenja klasifikatora.
 
 \section{Unaprijedna neuronska mreža}
-Najčešće korišteni tip umjetne neuronske mreže je unaprijedna višeslojna potpuno povezana umjetna neuronska mreža \engl{feedforward multilayered fully connected artificial neural network} čiju smo arhitekturu već upoznali sa slike \ref{fig:ann}. Često se ista u literaturi naziva i samo unaprijedna neuronska mreža zbog lakšeg dokumentiranja rada pa ćemo i mi preuzeti tu konvenciju, a implicitno ćemo znati puno ime i svojstva. Također, unaprijedna neuronska mreža je pravi primjer višeslojnog perceptrona jer se očigledno sastoji od više slojeva te se može učiti danas već nekolicinom uspješnih algoritama.
+Najčešće korišteni tip umjetne neuronske mreže je unaprijedna višeslojna potpuno povezana umjetna neuronska mreža \engl{feedforward multilayered fully connected artificial neural network} čiju smo generalnu arhitekturu već upoznali na slici \ref{fig:ann}. Često se ista u literaturi naziva i samo unaprijedna neuronska mreža zbog lakšeg dokumentiranja rada pa ćemo i mi preuzeti tu konvenciju, a implicitno ćemo biti svjesni punog imena i svojstva. Također, unaprijedna neuronska mreža je pravi primjer višeslojnog perceptrona jer se očigledno sastoji od više slojeva te se može učiti danas već nekolicinom uspješnih algoritama.
 
-Glavna zadaća unaprijedne neuronske mreže, kao što i samo ime nalaže, je da ulaze propagira kroz sve slojeve sve do izlaznog pri čemu se izvršava operacija mapiranja između ulaza i izlaza mreže na mnoštvo različitih načina. Također, sve operacije koje ćemo susresti se vrlo efikasno mogu prikazati matričnim računima čime se računalna izvedba implementacije i učenja unaprijedne neuronske mreže čini jako jednostavnim, no ponekad ipak to neće biti tako jednostavno jer postoji nekolicina parametara koje je potrebno "nariktati" različitim metoda koje ponekada i nisu zahvalne.
+Glavna zadaća unaprijedne neuronske mreže, kao što i samo ime nalaže, je da ulaze propagira kroz sve slojeve sve do izlaznog pri čemu se izvršava operacija mapiranja između ulaza i izlaza mreže na mnoštvo različitih načina. Također, sve operacije koje ćemo susresti se vrlo efikasno mogu prikazati matričnim računima čime se računalna izvedba implementacije i učenja unaprijedne neuronske mreže čini jako jednostavnim, no ponekad ipak to neće biti tako jednostavno jer postoji nekolicina parametara koje je potrebno "nariktati" različitim metoda koje često i nisu zahvalne.
 
-Pogledajmo jednu jednostavnu unaprijednu neuronsku mrežu s arhitekturom 2x3x2.
+Pogledajmo jednu jednostavnu unaprijednu neuronsku mrežu s arhitekturom 2x3x2 na slici \ref{fig:ffann}.
 Crnom bojom su označeni ulazi u ulaznom sloju, plavom bojom su označene težine između dva neurona, zelenom bojom je označen bias, a crvenom bojom su označeni izlazi iz neurona pa krenimo redom s notacijama:
 
 \begin{description}
@@ -428,15 +428,15 @@ Crnom bojom su označeni ulazi u ulaznom sloju, plavom bojom su označene težin
 \item[\textcolor{red}{y\textsubscript{j}\textsuperscript{(l)}} :] izlaz j-tog neurona l-tog sloja.
 \end{description}
 
-Prije nego se dotaknemo matematičke podloge, definirajmo ponovno strukturu umjetnog neurona.
-
 \begin{figure}[H]
     \centering
-    \includegraphics[scale=0.6]{img/ffann.png}
+    \includegraphics[scale=0.55]{img/ffann.png}
     \caption[Caption for LOF]{2x3x2 arhitektura unaprijedne neuronske mreže\footnotemark}
     \label{fig:ffann}
 \end{figure}
 \footnotetext{Izrađeno pomoću powerpoint-a i na temelju modela umjetne neuronske mreže iz literature \citep{nielsenANN}.}
+
+Prije nego se dotaknemo matematičke podloge, definirajmo ponovno strukturu umjetnog neurona.
 
 Do ovog trenutka upoznali smo se samo sa dvije vrste neurona, a to su MCP neuron koji se koristio u rosenblattovu modelu perceptron i ADALINE neuron. Pokazali smo i da se tako definirani neuroni koriste samo kada je problem kojeg rješavamo linearno interpretabilan. To se događa zbog funkcije skoka koja se nalazi na izlazu neurona te zbog nje učenje višeslojnog perceptrona nije moguće jer funckija skoka nije derivabilna te algoritam propagacije pogreške unatrag neće biti moguće provesti, ali o tome ćemo reći nešto detaljnije kada se dotaknemo učenja unaprijedne neuronske mreže. Zbog navedenog ćemo uvesti jednu generalnu strukturu umjetnog neurona koji ne mora koristiti funkciju skoka kao funkciju izlaza. Na slici \ref{fig:ai-neuron} nalazi se ažurirana struktura umjetnog neurona. Vidimo da je struktura gotovo identična već spomenutom neuronu na slici \ref{fig:step-neuron} osim oznake za funkciju na izlazu. Funkcije koje se nalaze na izlazu neurona nazivaju se aktivacijske funkcije\footnote{U starijim literaturama češći naziv bio je prijenosna funkcija.} i njihova je zadaća, kao što i samo ime nalaže, aktiviranje, odnosno deaktiviranje neurona ovisno o svojstvima funkcije i vrijednosti argumenta funkcije, tj. net vrijednosti i takvu funkciju ćemo označavati sa slovom \textbf{g}. Dakle, MCP neuron kojeg smo nedavno obrađivali kao aktivacijsku funkciju koristi funkciju skoka. U narednom poglavlju ćemo dati pregled često korištenih aktivacijskih funkcija te njihovih formula kao i derivacija istih, no u ovom trenutku je jedino bitno da smo svjesni da one postoje radi matričnog prikaza unaprijedne neuronske mreže.
 
@@ -452,7 +452,7 @@ Do ovog trenutka upoznali smo se samo sa dvije vrste neurona, a to su MCP neuron
 
 Prisjetimo se formule za izračun net vrijednosti koju smo definirali kada smo pričali o ADALINE neuronu \eqref{net:eq}:
 \[\text{$net = \sum\limits_{i=0}^n w\textsubscript{i} * x\textsubscript{i}$}\]
-Primjetite da sumacija u ovom slučaju ide od 0 jer, ako se prisjetite strukture ADALINE neurona, postoji težina w\textsubscript{0} koja predstavlja bias i ulaz x\textsubscript{0} konstante vrijednosti koja iznosi 1. Na slici \ref{fig:ffann} bias pojedinog neurona je eksplicitno naveden slovom \textbf{b} te zbog efikasnosti prikaza je izostavljen konstantni ulaz. S obzirom da se ADALINE neuron jedino mogao nalaziti u jednoslojnoj neuronskoj mreži, korišteno je slovo \textbf{x} kao ulaz neurona, a u našem slučaju mreža je višeslojna te ćemo ulaze notirati sa slovom \textbf{y}. Ako se pitate zašto je tomu tako, onda se dobro pitate jer je ta činjenica prešućena. Naime, ideja samog ulaznog sloja je da prenese dane ulaze na izlaz neurona te će tako izlazi ulaznog sloja biti jednaki ulazima, odnosno ne postoji nikakvo računanje net vrijednosti jer težine nisu prisutne. Također, svaki neuron osim ulaznih sadrži svoju net vrijednost. Uzevši u obzir navedene promjene i navedene notacije, net vrijednost pojedinog neurona možemo definirati na sljedeći način:
+Primjetite da sumacija u ovom slučaju ide od 0 jer, ako se prisjetite strukture ADALINE neurona, postoji težina w\textsubscript{0} koja predstavlja bias i ulaz x\textsubscript{0} konstante vrijednosti koja iznosi 1. Na slici \ref{fig:ffann} bias pojedinog neurona je eksplicitno naveden slovom \textbf{b} te zbog efikasnosti prikaza je izostavljen konstantni ulaz. S obzirom da se ADALINE neuron jedino mogao nalaziti u jednoslojnoj neuronskoj mreži, korišteno je slovo \textbf{x} kao ulaz neurona, a u našem slučaju mreža je višeslojna te ćemo ulaze svih slojeva osim ulaznog notirati slovom \textbf{y}. Ako se pitate zašto je tomu tako, onda se dobro pitate jer je ta činjenica prešućena. Naime, ideja samog ulaznog sloja je da prenese dane ulaze na izlaz neurona te će tako izlazi ulaznog sloja biti jednaki ulazima, odnosno ne postoji nikakvo računanje net vrijednosti jer težine nisu prisutne. Također, svaki neuron osim ulaznih sadrži svoju net vrijednost. Uzevši u obzir navedene promjene i navedene notacije, net vrijednost pojedinog neurona možemo definirati na sljedeći način:
 
 \begin{equation}
     \label{eq:novi-net}
@@ -479,12 +479,12 @@ Nakon uvedenih notacija, formule možemo prikazati na sljedeći način:
 
 \begin{equation}
     \label{eq:net-matrice}
-    \text{$\Vec{net}\textsuperscript{(l+1)} = W\textsuperscript{(l)} * \Vec{y}\textsuperscript{ (l)} + \Vec{b}\textsuperscript{ (l)}$}
+    \text{$\Vec{net}\textsuperscript{(l)} = \textbf{W}\textsuperscript{(l)} * \Vec{y}\textsuperscript{ (l)} + \Vec{b}\textsuperscript{ (l)}$}
 \end{equation}
 
 \begin{equation}
     \label{eq:izlaz-matrice}
-    \text{$\Vec{y}\textsuperscript{ (l+1)} = g(W\textsuperscript{(l)} * \Vec{y}\textsuperscript{ (l)} + \Vec{b}\textsuperscript{ (l)})$}
+    \text{$\Vec{y}\textsuperscript{ (l+1)} = g(\textbf{W}\textsuperscript{(l)} * \Vec{y}\textsuperscript{ (l)} + \Vec{b}\textsuperscript{ (l)})$}
 \end{equation}
 
 Radi lakšeg razumijevanja, pokušajmo pokazati kako će izgledati matrica težina, vektor bias-a i vektor izlaza ako promatramo vezu između prvog i drugog sloja, odnosno ulaznog i skrivenog sa slike \ref{fig:ffann}.
@@ -498,18 +498,167 @@ Radi lakšeg razumijevanja, pokušajmo pokazati kako će izgledati matrica teži
   \end{bmatrix},\quad
   \vec{y}\textsuperscript{ (1)} = 
   \begin{bmatrix}
-   y\textsubscript{1}\textsuperscript{(1)} && y\textsubscript{2}\textsuperscript{(1)}
+   y\textsubscript{1}\textsuperscript{(1)} \\
+   y\textsubscript{2}\textsuperscript{(1)}
   \end{bmatrix},\quad
   \vec{b}\textsuperscript{ (1)} = 
   \begin{bmatrix}
-    b\textsubscript{1}\textsuperscript{(1)} 
-    & b\textsubscript{2}\textsuperscript{(1)}
-    & b\textsubscript{3}\textsuperscript{(1)}
+    b\textsubscript{1}\textsuperscript{(1)} \\
+    b\textsubscript{2}\textsuperscript{(1)} \\
+    b\textsubscript{3}\textsuperscript{(1)}
   \end{bmatrix}
 \]
 
+Vidimo da dimenzije svih matrica odgovaraju za operaciju produkta matrica, odnosno operaciju zbroja matrica. Isti postupak ponavljamo za svaki sloj unaprijedne neuronske mreže sve dok ne dobijemo izlaze izlaznog sloja kada stajemo sa računom pri čemu još jednom valja naglasiti da izlazi jednog sloja postaju ulazi onom sljedećem.
 
 \subsection{Aktivacijske funkcije}
+Aktivacijska funkcija \engl{activation function}, kao što smo i spomenuli kod računa unaprijedne neuronske mreže, je funkcija koja se nalazi tik prije izlaza neurona i određuje hoće li dotični biti aktiviran, odnosno deaktiviran, tj. hoće li se "paliti" ili ne. Danas postoji veliki broj aktivacijskih funkcija, no mi ćemo spomenuti one koje se najviše koriste i koje su korištene u ovom radu, a u poglavlju s rezultatima ćemo pokazati kako neke od njih utječu na sam izgled decizijskih granica.
+
+\subsubsection{Binarna funkcija skoka}
+Binarna funkcija skoka \engl{binary step function} je funkcija koja se temelji na nekom fiksnom pragu i s njome smo se susreli kod MCP neurona i rosenblattovog perceptrona. Neuroni koji koriste ovu kao aktivacijsku funkciju nazivaju se TLU \engl{treshold logic unit} neuroni. Na slici \ref{fig:step-fun} nalazi se graf jedne takve funkcije. Nedostatak ovakve funkcije kod učenja višeslojnog perceptrona je što nije derivabilna i što koristi binarne izlaze pa višerazredna klasifikacija nije moguća. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{img/step-fun.png}
+    \caption[Caption for LOF]{Funkcija skoka \textit{f(net) = step(net)}\footnotemark}
+    \label{fig:step-fun}
+\end{figure}
+\footnotetext{Preuzeto iz literature \citep{cupicANN}.}
+
+\subsubsection{Linearne aktivacijske funkcije}
+Linearne aktivacijske funkcije su funkcije oblika \textit{y = ax + b} i one generiraju izlaz koji je proporcionalan ulazu pa su zbog toga nešto efikasnije od funckije skoka. No, i one imaju dosta nezgodne nedostatke kada govorimo o učenju višeslojnog perceptrona. One jesu derivabilne, ali njihova derivacija je konstanta što za algoritam propagacije pogreške unatrag nikako nije dobro. Također, ako svaki sloj koristi linearnu aktivacijsku funkciju, onda ne postoji nikakva razlika među slojevima jer će na izlazu opet biti linearna aktivacijska funkcija zbog pravila o linearnosti koji kaže da je linearna kombinacija linearnih funkcija također linearna funkcija. Posljedica toga je da linearna aktivacijska funkciju višeslojni perceptron pretvara u jednoslojni te se tada radi o običnom problemu linearne regresije. Na slici \ref{fig:id-fun} nalazi se graf jedne takve funkcije.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{img/id-fun.png}
+    \caption[Caption for LOF]{Funkcija identiteta \textit{f(net) = net}\footnotemark}
+    \label{fig:id-fun}
+\end{figure}
+\footnotetext{Preuzeto iz literature \citep{cupicANN}.}
+
+\subsubsection{Nelinearne aktivacijske funkcije}
+Nelinearne aktivacijske funkcije su najčešće korištene funkcije kada se radi o učenju višeslojnog perceptrona jer uvelike čine unaprijednu neuronsku mrežu ekspresivnijom i ostavljaju mogućnost kreiranja jako dubokih neuronskih mreža po broju skrivenih slojeva. Većina njih je derivabilna što znači da se mogu koristiti u učenju algoritmom propagacije pogreške unatrag te njihove derivacije se mogu zapisati pomoću samih funkcija što znatno olakšava i implementaciju istih.
+
+\begin{enumerate}
+    \item \textbf{Sigmoidalna/logistička funkcija} (prikazana na slici \ref{fig:sigm-fun}):
+    \begin{equation}
+        \label{eq:sigm}
+        sigm(net) = \frac{1}{1 + e^{-net}},
+    \end{equation}
+    \begin{equation}
+        \label{eq:sigm-der}
+        sigm'(net) = sigm(net) * (1 - sigm(net)).
+    \end{equation}
+    Izlaze mapira na vrijednosti iz intervala $(0, 1)$. Kod ove funkcije se javlja problem išćezavajućeg gradijenta \engl{vanishing gradient} što znači da će jako velike ulaze, odnosno jako male izlaze mapirati na vrijednosti oko 1, odnosno oko 0 i time će se učenje mreže znatno usporiti jer će ažuriranje težina gotovo pa stagnirati. Još jedan problem koji se javlja je centriranje svih izlaza oko vrijednosti 0.5 a ne oko 0. To se pokazuje dosta lošim svojstvom kroz literature. Neuroni koji koriste sigmoidalnu funkciju kao aktivacijsku nazivaju se sigmoidalni neuroni. Također, izvođenje ove funkcije je računalno skupo i danas se slabo više koristi.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.5]{img/sigm-fun.png}
+        \caption[Caption for LOF]{Sigmoidalna funkcija \textit{f(net) = sigm(net)}\footnotemark}
+        \label{fig:sigm-fun}
+    \end{figure}
+    \footnotetext{Preuzeto iz literature \citep{cupicANN}.}
+    \item \textbf{Funkcija tangens hiperbolni} (prikazana na slici \ref{fig:tanh-fun}):
+    \begin{equation}
+        \label{eq:tanh}
+        tanh(net) = \frac{e^{net} - e^{-net}}{e^{net} + e^{-net}} = 2 * sigm(2 * net) - 1,
+    \end{equation}
+    \begin{equation}
+        \label{eq:tanh-der}
+        tanh'(net) = 1 - tanh^2(net).
+    \end{equation}
+    Tangens hiperbolni je zapravo mala modifikacija sigmoidalne funkcije s razlikom u tome da se izlazi centriraju oko 0 što ostavlja više prostora za različite vrste klasifikacija. Ostala svojstva su gotovo identična i tangens hiperbolni se pokazuje nešto bržim za razliku od sigmoidalne funkcije pa se češće korišten u učenjima unaprijedne neuronske mreže.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.5]{img/tanh-fun.png}
+        \caption[Caption for LOF]{Tangens hiperbolni \textit{f(net) = tanh(net)}\footnotemark}
+        \label{fig:tanh-fun}
+    \end{figure}
+    \footnotetext{Preuzeto iz literature \citep{cupicANN}.}
+    \item \textbf{Funkcija zglobnica} \engl{ReLU,Rectified Linear Unit} (prikazana na slici \ref{fig:relu-fun}):
+    \begin{equation}
+        \label{eq:relu}
+        relu(net) = max(0, net),
+    \end{equation}
+    \begin{equation}
+        \label{eq:relu-der}
+        relu'(net) =
+        \begin{cases}
+            1 & net > 0,\\
+            0 & \text{inače}.
+        \end{cases}
+        .
+    \end{equation}
+    Iako izgleda kao linearna funkcija, funkcija zglobnica ima svoju derivaciju koja se može koristiti u algoritmu propagacije pogreške unatrag. Računalno je dosta povoljnija od prethodne dvije te je zbog toga danas sve korištenija i to pogotovo tijekom učenja dubokih neuronskih mreža. No, funkcija ima jedan nezgodan problem a to je da "ubija" sve neurone čiji su izlazi jako mali ili negativni te se time učenje u nekim slučajevima izrazito otežava jer gradijent postaje 0. Tom problemu se doskočilo na način da se ipak propuštaju određeni neuroni koji imaju negativne izlaze. Takva funkcija se onda naziva funkcija propusna zglobnica \engl{leaky ReLU} (prikazan na slici \ref{fig:lrelu-fun}) i ima sljedeću definiciju:
+    \begin{equation}
+        \label{eq:lrelu}
+        lrelu(net) = 
+        \begin{cases}
+            net & net > 0,\\
+            \alpha * net & \text{inače}.
+        \end{cases}
+        ,
+    \end{equation}
+    \begin{equation}
+        \label{eq:lrelu-der}
+        lrelu'(net) =
+        \begin{cases}
+            1 & net > 0,\\
+            \alpha & \text{inače}.
+        \end{cases}
+        .
+    \end{equation}
+    $\alpha$ je parametar koji je često jako mali realan broj i u raznim literaturama poprima vrijednosti poput 0.1 i 0.2. Funkcija propusna zglobnica je zgodna, no pokazuje se da ne daje konzistentne rezultate kada mora raditi predikcije negativnih vrijednosti.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.55]{img/relu-fun.png}
+        \caption[Caption for LOF]{Funkcija zglobnica \textit{f(net) = relu(net)}\footnotemark}
+        \label{fig:relu-fun}
+    \end{figure}
+    \footnotetext{Preuzeto iz literature \citep{cupicANN}.}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[scale=0.55]{img/lrelu-fun.png}
+        \caption[Caption for LOF]{Funkcija propusna zglobnica \textit{f(net) = lrelu(net)}\footnotemark}
+        \label{fig:lrelu-fun}
+    \end{figure}
+    \footnotetext{Preuzeto iz literature \citep{cupicANN}.}
+    \item \textbf{Funkcija softmax}: \newline
+    Funkcija softmax je funkcija koja ulaze transformira na vrijednost između 0 i 1 baš kao i sigmoidalna funkcija pa je graf praktički identičan te ga nema smisla ponovno prikazivati. No, ideja softmax funkcije je da vrati postotke u kojima se dotični ulazi nalaze i onda suma svih tih postotaka mora biti stopostotna. Koristi se samo kao aktivacijska funkcija izlaznog sloja i vrlo je pogodna kada se radi o problemima višerazredne klasifikacije jer je onda preko postotaka lako za odrediti koji razred se nalazi na izlazu. Definicija funkcije je malo drugačija od ostalih zato što kao ulazni argument prima vektor vrijednosti a ne samo jednu vrijednost i glasi ovako \citep{softmax}:
+    \[
+        S(\vec{a}) : \quad
+        \begin{bmatrix}
+            a\textsubscript{1} \\
+            a\textsubscript{2} \\
+            \dots \\
+            a\textsubscript{N}
+        \end{bmatrix}
+        \xrightarrow{}
+        \begin{bmatrix}
+            S\textsubscript{1} \\
+            S\textsubscript{2} \\
+            \dots \\
+            S\textsubscript{N}
+        \end{bmatrix} \quad \text{gdje je}
+    \]
+    \begin{equation}
+        \label{eq:soft}
+        S\textsubscript{j} = \frac{e^{a\textsubscript{j}}}{\sum\limits_{k=1}^ne^{a\textsubscript{k}}},
+    \end{equation}
+    \begin{equation}
+        \label{eq:soft-der}
+        S(\vec{a})' = S(\vec{a}) * (1 - S(\vec{a})).
+    \end{equation}
+    Vidimo dakle da je i derivacija softmax funkcije gotovo identična derivaciji sigmoidalne, uzevši u obzir da je ulazni argument vektor.
+\end{enumerate}
+
+\subsection{Inicijalizacija i normalizacija}
+Do sada smo definirali kako za neke ulaze dobiti nekakvu vrstu izlaza koji će biti u rasponu određenom nekom od navedenih aktivacijskih funkcija, no nigdje nismo rekli kakvi ti ulazi trebaju biti. Kojem rasponu brojeva trebaju pripadati? Koje početne vrijednosti trebaju imati težine svih slojeva? Odgovore na ta pitanja ćemo sada pokušati odgovoriti.
+
+\subsubsection{Normalizacija}
+Normalizacija \engl{normalization} je postupak kojim se vrijednosti nekih podataka adaptiraju na neki fiksni interval kao npr. na interval $(0, 1)$. To je potrebno napraviti prventstveno jer je tako računalu znatno jednostavnije izvoditi operacije s matricama, a i najčešće na izlazima očekujemo vrijednosti između -1 i 1 pa ako su ulazne vrijednosti puno veće od navedenog, onda mreža vrlo vjerojatno neće dobro naučiti ili će se mučiti pronađe prave težine.
+
+\subsubsection{Inicijalizacija}
+Inicijalizacija \engl{initialization} težina igra još veću ulogu u učenju unaprijedne neuronske mreže od normalizacije ulaza. Zašto nam je uopće potrebna inicijalizacija težina? Pretpostavimo da su sve težine inicijalno postavljene na 0. U tom slučaju će svi neuroni biti simetrični i naučit će značajke te zbog toga učenje neće biti moguće. Općenito, bilo kakva inicijalizacija nekom konstantom će rezultirati istim rezultatom. Što će se dogoditi ako težine inicijaliziramo jako velikim, odnosno jako malim brojevima? Ako provedemo takvu inicijalizaciju, dogodit će se problem kojeg nazivamo eksplodirajući, odnosno iščezavajući gradijent. Ako nastupi eksplodirajući gradijent, tada će učenje unaprijedne neuronske mreže drastično divergirati, dok će kod iščezavajućeg gradijenta učenje biti izrazito sporo. Zbog navedenih razloga je vrlo jasno da se težine moraju kvalitetno inicijalizirati. Postoje mnoge metode inicijalizacije, no spomenut ćemo samo onu koja je korištena u implementaciji, a to je Xavier inicijalizacija koja vrijednosti težina generira normalnom razdiobom gdje očekivanje, $\mu$, iznosi 0, a standardna devijacija, $\sigma$, iznosi $\sqrt{\frac{1}{n\textsuperscript{(l-1)}}}$. Nazivnik predstavlja broj neurona u prijašnjem sloju \citep{init}.
 
 \section{Učenje unaprijedne neuronske mreže}
 
