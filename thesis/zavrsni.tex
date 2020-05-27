@@ -438,7 +438,7 @@ Crnom bojom su označeni ulazi u ulaznom sloju, plavom bojom su označene težin
 
 Prije nego se dotaknemo matematičke podloge, definirajmo ponovno strukturu umjetnog neurona.
 
-Do ovog trenutka upoznali smo se samo sa dvije vrste neurona, a to su MCP neuron koji se koristio u rosenblattovu modelu perceptron i ADALINE neuron. Pokazali smo i da se tako definirani neuroni koriste samo kada je problem kojeg rješavamo linearno interpretabilan. To se događa zbog funkcije skoka koja se nalazi na izlazu neurona te zbog nje učenje višeslojnog perceptrona nije moguće jer funckija skoka nije derivabilna te algoritam propagacije pogreške unatrag neće biti moguće provesti, ali o tome ćemo reći nešto detaljnije kada se dotaknemo učenja unaprijedne neuronske mreže. Zbog navedenog ćemo uvesti jednu generalnu strukturu umjetnog neurona koji ne mora koristiti funkciju skoka kao funkciju izlaza. Na slici \ref{fig:ai-neuron} nalazi se ažurirana struktura umjetnog neurona. Vidimo da je struktura gotovo identična već spomenutom neuronu na slici \ref{fig:step-neuron} osim oznake za funkciju na izlazu. Funkcije koje se nalaze na izlazu neurona nazivaju se aktivacijske funkcije\footnote{U starijim literaturama češći naziv bio je prijenosna funkcija.} i njihova je zadaća, kao što i samo ime nalaže, aktiviranje, odnosno deaktiviranje neurona ovisno o svojstvima funkcije i vrijednosti argumenta funkcije, tj. net vrijednosti i takvu funkciju ćemo označavati sa slovom \textbf{g}. Dakle, MCP neuron kojeg smo nedavno obrađivali kao aktivacijsku funkciju koristi funkciju skoka. U narednom poglavlju ćemo dati pregled često korištenih aktivacijskih funkcija te njihovih formula kao i derivacija istih, no u ovom trenutku je jedino bitno da smo svjesni da one postoje radi matričnog prikaza unaprijedne neuronske mreže.
+Do ovog trenutka upoznali smo se samo sa dvije vrste neurona, a to su MCP neuron koji se koristio u rosenblattovu modelu perceptron i ADALINE neuron. Pokazali smo i da se tako definirani neuroni koriste samo kada je problem kojeg rješavamo linearno interpretabilan. To se događa zbog funkcije skoka koja se nalazi na izlazu neurona te zbog nje učenje višeslojnog perceptrona nije moguće jer funckija skoka nije derivabilna te algoritam propagacije pogreške unatrag neće biti moguće provesti, ali o tome ćemo reći nešto detaljnije kada se dotaknemo učenja unaprijedne neuronske mreže. Zbog navedenog ćemo uvesti jednu generalnu strukturu umjetnog neurona koji ne mora koristiti funkciju skoka kao funkciju izlaza. Na slici \ref{fig:ai-neuron} nalazi se ažurirana struktura umjetnog neurona. Vidimo da je struktura gotovo identična već spomenutom neuronu na slici \ref{fig:step-neuron} osim oznake za funkciju na izlazu. Funkcije koje se nalaze na izlazu neurona nazivaju se aktivacijske funkcije\footnote{U starijim literaturama češći naziv bio je prijenosna funkcija.} i njihova je zadaća, kao što i samo ime nalaže, aktiviranje, odnosno deaktiviranje neurona ovisno o svojstvima funkcije i vrijednosti argumenta funkcije, tj. net vrijednosti i takvu funkciju ćemo označavati sa slovom \textbf{g\footnote{Općenito, svaki neuron ima svoju aktivacijsku funkciju te zbog toga bi ih trebali indeksirati, ali zbog jednostavnosti ćemo ih sve označavati samo s g.}}. Dakle, MCP neuron kojeg smo nedavno obrađivali kao aktivacijsku funkciju koristi funkciju skoka. U narednom poglavlju ćemo dati pregled često korištenih aktivacijskih funkcija te njihovih formula kao i derivacija istih, no u ovom trenutku je jedino bitno da smo svjesni da one postoje radi matričnog prikaza unaprijedne neuronske mreže.
 
 \begin{figure}[H]
     \centering
@@ -479,7 +479,7 @@ Nakon uvedenih notacija, formule možemo prikazati na sljedeći način:
 
 \begin{equation}
     \label{eq:net-matrice}
-    \text{$\Vec{net}\textsuperscript{(l)} = \textbf{W}\textsuperscript{(l)} * \Vec{y}\textsuperscript{ (l)} + \Vec{b}\textsuperscript{ (l)}$}
+    \text{$\Vec{net}\textsuperscript{(l+1)} = \textbf{W}\textsuperscript{(l)} * \Vec{y}\textsuperscript{ (l)} + \Vec{b}\textsuperscript{ (l)}$}
 \end{equation}
 
 \begin{equation}
@@ -674,13 +674,13 @@ Gradijentni spust \engl{gradient descent} je algoritam koji se koristi za minimi
 
 \begin{equation}
     \label{eq:grad}
-    x \leftarrow x - \alpha * \frac{\partial}{\partial x}f(x)
+    x \leftarrow x - \alpha \cdot{\frac{\partial}{\partial x}}f(x)
 \end{equation}
 
 pri čemu je $\alpha$ stopa učenja koja je često mali realan broj. Dan je primjer funkcije sa jednom varijablom, no algoritam djeluje i na funkcije s više varijabli. Glavna ideja algoritma je da se po grafu pomičemo u smjeru koji pokazuje na točku gdje će derivacija biti približno jednaka 0, a brzinu kretanja određuje stopa učenja koju smo obradili nešto ranije.
 
 \subsection{Algoritam propagacije pogreške unatrag}
-Algoritam propagacije pogreške unatrag \engl{backpropagation algorithm} je trenutno možda najkorišteniji algoritam učenja unaprijedne neuronske mreže. 1986. Rumelhart zajedno sa dvojicom prijatelja u djelu \textit{Parallel Distributed Processing} po prvi put definira termin \textit{backpropagation} i učenje višeslojnog perceptrona. Oko te godine konektivistički pristup ponovno dobiva zalet i prva zima umjetne inteligencije polako prolazi. U ovom radu nećemo ulazi u detalje izvoda samog algoritma, već ćemo dati općeniti pregled gotovih formula, pseudokod algoritma te neke od inačica. Sve notacije koje smo uveli kod definicije unaprijedne neuronske mreže će vrijediti i ovdje.
+Algoritam propagacije pogreške unatrag \engl{backpropagation algorithm} je trenutno možda najkorišteniji algoritam učenja unaprijedne neuronske mreže. 1986. Rumelhart zajedno sa dvojicom prijatelja u djelu \textit{Parallel Distributed Processing} po prvi put definira termin \textit{backpropagation} i učenje višeslojnog perceptrona. Oko te godine konektivistički pristup ponovno dobiva zalet i prva zima umjetne inteligencije polako prolazi. U ovom radu nećemo ulaziti u detalje izvoda samog algoritma, već ćemo dati općeniti pregled gotovih formula, pseudokod algoritma te neke od inačica. Sve notacije koje smo uveli kod definicije unaprijedne neuronske mreže će vrijediti i ovdje.
 
 Pretpostavimo da imamo skup uzoraka koji se sastoji od \textit{N} različitih uzoraka. Svaki uzorak je predstavljen vektorom ulaza i vektorom očekivanih izlaza i označimo ga kao $(x\textsubscript{s,1}, x\textsubscript{s,2},\dots, x\textsubscript{s,n}) \xrightarrow{} (d\textsubscript{s,1}, d\textsubscript{s,2},\dots, d\textsubscript{s,m})$, gdje su ulazi označeni slovom \textbf{x}, a željeni izlazi slovom \textbf{d}. Indeks \textit{s} predstavlja \textit{s}-ti uzorak, a \textit{n} i \textit{m} broj neurona na ulazu, odnosno na izlazu neuronske mreže\footnote{Pogledaj sliku \ref{fig:ann}.}. Također, pretpostavimo da je mreža sastavljena od \textit{L} slojeva gdje je \textit{L}-ti sloj izlazni sloj. Da bi mreža mogla učiti, moramo definirati određenu funkciju kazne pomoću koje će mreža dobiti povratnu informaciju o tome koliko dobro ili loše uči te na temelju te pogreške korigirati iznose težina. Funkcija kazne za jedan uzorak definirana je na sljedeći način:
 
@@ -689,14 +689,137 @@ Pretpostavimo da imamo skup uzoraka koji se sastoji od \textit{N} različitih uz
     E(s) = \frac{1}{2}\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})^2.
 \end{equation}
 
-S obzirom da nam je cilj učiti nad cijelim skupom uzoraka, onda je potrebno definirati funkciju kazne za cijeli skup:
+S obzirom da želimo učiti nad cijelim skupom uzoraka, onda je potrebno definirati funkciju kazne za cijeli skup:
 
 \begin{equation}
     \label{eq:err}
-    E = \frac{1}{N}\sum\limits_{s=1}^NE(s) = \frac{1}{2\cdot{N}}\sum\limits_{s=1}^N\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})^2.
+    E = \frac{1}{N}\sum\limits_{s=1}^NE(s) = \frac{1}{2N}\sum\limits_{s=1}^N\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})^2.
 \end{equation}
 
-\section{Primjena umjetnih neuronskih mreža}
+Ako se prisjetite formule za izračun izlaza neurona pomoću net vrijednosti i aktivacijske funkcije, onda vrlo lako možemo zaključiti da funkcija kazne ovisi o težinama jer svaki izlaz ovisi o težinama i ulazima prijašnjeg sloja, a svaki ulaz je zapravo izlaz prijašnjeg sloja pa onda i on posljedično ovisi o težinama i tako sve do prvog skrivenog sloja:
+
+\[
+    \vec{y}\textsuperscript{ (L)} = g(\textbf{W\textsuperscript{(L-1)}} \cdot{\vec{y}\textsuperscript{ (L-1)}} + \vec{b}\textsuperscript{ (L-1)}),
+\]
+\[
+    \vec{y}\textsuperscript{ (L-1)} = g(\textbf{W\textsuperscript{(L-2)}} \cdot{\vec{y}\textsuperscript{ (L-2)}} + \vec{b}\textsuperscript{ (L-2)}),
+\]
+\[
+    \dots
+\]
+\[
+    \vec{y}\textsuperscript{ (2)} = g(\textbf{W\textsuperscript{(1)}} \cdot{\vec{y}\textsuperscript{ (1)}} + \vec{b}\textsuperscript{ (1)}).
+\]
+
+Sada kada to znamo, onda je potrebno minimizirati funkciju, tj. algoritmom gradijentni spust pronaći one težine za koje je funkcija kazne minimalna:
+
+\begin{equation}
+    \label{eq:weight-grad}
+    w\textsubscript{jk}\textsuperscript{(l)} \leftarrow  w\textsubscript{jk}\textsuperscript{(l)} - \alpha \cdot{\frac{\partial E}{\partial w\textsubscript{jk}\textsuperscript{(l)}}}.
+\end{equation}
+
+Možda se sada pitate zašto nam je potreban backpropagation algoritam kada očigledno možemo gradijent spusta direktno primijeniti. Ta pretpostavka je u redu u slučaju kada nemamo mnoštvo uzoraka za učenje i kada arhitektura mreže nije kompleksna, no što ako imamo desetke tisuća uzoraka sa nekoliko skrivenih slojeva gdje svaki ima minimalno deset neurona? Tada bi računanje jedne po jedne težine bilo izrazito računalno zahtjevno a to želimo izbjeći. Upravo zbog navedenog koristimo backpropagation algoritam jer njime uvelike olakšavamo izračun parcijalnih derivacija za sve težine, a time i samo učenje mreže.
+
+Kada smo govorili o ADALINE neuronu, spomenuli smo da se on, kao i MCP neuron, uče delta pravilom. Delta pravilom je moguće učiti samo jednoslojne perceptrone, stoga se ono moralo malo nadograditi tako da se može koristiti u za učenje višeslojnog perceptrona.
+
+% \begin{description}
+%     \item[$\delta$\textsubscript{j}\textsuperscript{(l)} :] pogreška između očekivanog i stvarnog izlaza j-tog neurona l-tog sloja,
+%     \item[$\vec{\delta}$\textsuperscript{ (l)} :] vektora pogrešaka l-tog sloja,
+% \end{description}
+
+Pokažimo kako bi izgledala parcijalna derivacija funkcije kazne u zadnjem sloju prije izlaznog:
+
+\begin{align}
+    \frac{\partial E}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}} &= \frac{\partial}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}}\left[\frac{1}{2N}\sum\limits_{s=1}^N\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})^2\right] \\
+    &= \frac{1}{2N}\sum\limits_{s=1}^N\sum\limits_{i=1}^m2\cdot{(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)}}) \cdot{(-1)} \cdot{\frac{\partial y\textsubscript{s,i}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}}} \\
+    &= -\frac{1}{N}\sum\limits_{s=1}^N\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})\cdot{\frac{\partial y\textsubscript{s,i}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}}}\label{eq:4-26}
+\end{align}
+
+S obzirom da težina w\textsubscript{jk}\textsuperscript{(L-1)} utječe samo na y\textsubscript{s,j}\textsuperscript{(L)}, onda svaka parcijalna derivacija $\frac{\partial y\textsubscript{s,i}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}}$ za slučaj da je $i\neq{j}$ iščezava te vrijedi:
+\[
+    \sum\limits_{i=1}^m\frac{\partial y\textsubscript{s,i}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}} = \frac{\partial y\textsubscript{s,j}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}}.
+\]
+Dakle, sada možemo pisati:
+\begin{equation}
+    \label{eq:4-27}
+    \frac{\partial E}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}} = -\frac{1}{N}\sum\limits_{s=1}^N(d\textsubscript{s,j} - y\textsubscript{s,j}\textsuperscript{(L)})\cdot{\frac{\partial y\textsubscript{s,j}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}}}
+\end{equation}
+
+Preostalu parcijalnu derivaciju možemo riješiti pomoću pravila ulančavanja:
+\begin{equation}
+    \frac{\partial y\textsubscript{s,j}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}} = \frac{\partial y\textsubscript{s,j}\textsuperscript{(L)}}{\partial net\textsubscript{s,j}\textsuperscript{(L)}} \cdot \frac{\partial net\textsubscript{s,j}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}},
+\end{equation}
+
+gdje vrijedi sljedeće:
+\begin{equation}
+    \frac{\partial y\textsubscript{s,j}\textsuperscript{(L)}}{\partial net\textsubscript{s,j}\textsuperscript{(L)}} = \frac{\partial g(net\textsubscript{s,j}\textsuperscript{(L)})}{\partial net\textsubscript{s,j}\textsuperscript{(L)}} = g'(net\textsubscript{s,j}\textsuperscript{(L)}),
+\end{equation}
+\begin{equation}
+    \frac{\partial net\textsubscript{s,j}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}} = \frac{\partial}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}}(w\textsubscript{j1}\textsuperscript{(L-1)}\cdot y\textsubscript{s,1}\textsuperscript{(L-1)} + \dots + w\textsubscript{jk}\textsuperscript{(L-1)}\cdot y\textsubscript{s,k}\textsuperscript{(L-1)} + \dots) = y\textsubscript{s,k}\textsuperscript{(L-1)}.
+\end{equation}
+
+Nakon uvrštavanja u izraz \eqref{eq:4-27} dobivamo:
+\begin{align}
+    \frac{\partial E}{\partial w\textsubscript{jk}\textsuperscript{(L-1)}} &= -\frac{1}{N}\sum\limits_{s=1}^N g'(net\textsubscript{s,j}\textsuperscript{(L)})\cdot(d\textsubscript{s,j} - y\textsubscript{s,j}\textsuperscript{(L)})\cdot y\textsubscript{s,k}\textsuperscript{(L-1)} \\
+    &= -\frac{1}{N}\sum\limits_{s=1}^N \delta\textsubscript{s,j}\textsuperscript{(L)} \cdot y\textsubscript{s,k}\textsuperscript{(L-1)},
+\end{align}
+
+gdje je $\delta\textsubscript{s,j}\textsuperscript{(L)}$ pogreška j-tog neurona s-tog uzorka na izlaznom sloju i definira se kao:
+\begin{equation}
+    \label{eq:delta-izlaz}
+    \delta\textsubscript{s,j}\textsuperscript{(L)} = g'(net\textsubscript{s,j}\textsuperscript{(L)})\cdot(d\textsubscript{s,j} - y\textsubscript{s,j}\textsuperscript{(L)}).
+\end{equation}
+Sada kada smo definirali parcijalnu derivaciju za proizvoljnu težinu zadnjeg skrivenog sloja, ažuriranje težina na temelju \eqref{eq:weight-grad} glasi:
+\begin{align}
+    w\textsubscript{jk}\textsuperscript{(L-1)} &\leftarrow w\textsubscript{jk}\textsuperscript{(L-1)} - \alpha\cdot \left(-\frac{1}{N}\sum\limits_{s=1}^N \delta\textsubscript{s,j}\textsuperscript{(L)} \cdot y\textsubscript{s,k}\textsuperscript{(L-1)}\right) \\
+    &\leftarrow w\textsubscript{jk}\textsuperscript{(L-1)} + \eta\cdot\sum\limits_{s=1}^N \delta\textsubscript{s,j}\textsuperscript{(L)} \cdot y\textsubscript{s,k}\textsuperscript{(L-1)}
+\end{align}
+gdje smo umjesto $\alpha \cdot \frac{1}{N}$ uveli konstantu $\eta$ za koju i dalje vrijede svojstva koje smo naveli za stopu učenja.
+
+\bigskip
+
+Postupak koji smo proveli vrijedi kada tražimo parcijalne derivacije za težine predzadnjeg sloja, no procedura za ostale slojeve je gotovo pa identična. Postupak se počinje mijenjati u formuli \eqref{eq:4-26}:
+\begin{equation}
+    \frac{\partial E}{\partial w\textsubscript{jk}\textsuperscript{(L-2)}} =
+    -\frac{1}{N}\sum\limits_{s=1}^N\sum\limits_{i=1}^m(d\textsubscript{s,i} - y\textsubscript{s,i}\textsuperscript{(L)})\cdot{\frac{\partial y\textsubscript{s,i}\textsuperscript{(L)}}{\partial w\textsubscript{jk}\textsuperscript{(L-2)}}},
+\end{equation}
+gdje navedenu parcijalnu derivaciju opet rješavamo pravilom ulančavanja. Ako detaljnije raspišemo, onda ćemo vidjet da će biti potrebno "spustiti" se do (L-2)-og sloja. Konačna formula za pogrešku j-tog neurona (L-2)-og sloja i ažuriranje težina će onda glasiti: 
+\begin{equation}
+    \label{eq:delta-ostali}
+    \delta\textsubscript{s,j}\textsuperscript{(L-1)} = g'(net\textsubscript{s,j}\textsuperscript{(L)})\cdot\sum\limits_{i=1}^m\delta\textsubscript{s,j}\textsuperscript{(L)}\cdot w\textsubscript{i,j}\textsuperscript{(L-1)},
+\end{equation}
+\begin{equation}
+    w\textsubscript{jk}\textsuperscript{(L-2)} \leftarrow w\textsubscript{jk}\textsuperscript{(L-2)} + \eta\cdot\sum\limits_{s=1}^N \delta\textsubscript{s,j}\textsuperscript{(L-1)} \cdot y\textsubscript{s,k}\textsuperscript{(L-2)}.
+\end{equation}
+
+\begin{algorithm}
+\caption{Backpropagation algoritam\footnotemark}
+\label{algo:alg-backprop}
+    \begin{enumerate}
+        \item[\textbf{1.}] Ciklički prolazi kroz svih \textit{N} uzoraka za učenje, jedan po jedan.
+        \item[\textbf{2.}] Ponavljaj dok nije zadovoljen uvjet zaustavljanja.
+        \item[\textbf{3.}] Za svaki uzorak iz skupa uzoraka za učenje čini:
+        \begin{enumerate}
+            \item[\textbf{1.}] Postavi uzorak na ulaz unaprijedne neuronske mreže i izračunaj izlaze za sve neurone primjenom formule \eqref{eq:izlaz-matrice}.
+            \item[\textbf{2.}] Izračunaj pogrešku svakog od neurona izlaznog sloja po formuli \eqref{eq:delta-izlaz}.
+            \item[\textbf{3.}] Vraćaj se sloj po sloj i izračunaj pogreške svakog neurona po formuli \eqref{eq:delta-ostali}.
+            \item[\textbf{4.}] Ažuriraj težine po formuli:
+                \begin{equation}
+                    \label{eq:azuriranje}
+                    w\textsubscript{jk}\textsuperscript{(l)} \leftarrow w\textsubscript{jk}\textsuperscript{(l)} + \eta\cdot\sum\limits_{s=1}^N \delta\textsubscript{s,j}\textsuperscript{(l+1)} \cdot y\textsubscript{s,k}\textsuperscript{(l)}.
+                \end{equation}
+            \item[\textbf{5.}] Ažuriraj biase po formuli (prisjetite se da su ulazi konstantni):
+                \begin{equation}
+                    \label{eq:azuriranje-bias}
+                    b\textsubscript{j}\textsuperscript{(l)} \leftarrow b\textsubscript{j}\textsuperscript{(l)} + \eta\cdot\sum\limits_{s=1}^N \delta\textsubscript{s,j}\textsuperscript{(l+1)}.
+                \end{equation}
+        \end{enumerate}
+    \end{enumerate}
+\end{algorithm}
+\footnotetext{Iz literature \citep{cupicANN}.}
+
+\newpage
+dakle
 
 \chapter{Rezultati}
 

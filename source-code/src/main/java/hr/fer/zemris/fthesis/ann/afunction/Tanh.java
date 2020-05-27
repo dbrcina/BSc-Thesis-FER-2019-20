@@ -13,4 +13,9 @@ public class Tanh implements ActivationFunction {
         return 1 - temp * temp;
     }
 
+    @Override
+    public String toString() {
+        return "tanh";
+    }
+
 }

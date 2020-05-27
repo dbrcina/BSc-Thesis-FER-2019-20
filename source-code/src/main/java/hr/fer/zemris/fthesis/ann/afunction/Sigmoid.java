@@ -13,4 +13,9 @@ public class Sigmoid implements ActivationFunction {
         return temp * (1 - temp);
     }
 
+    @Override
+    public String toString() {
+        return "sigmoid";
+    }
+
 }

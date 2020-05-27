@@ -12,4 +12,9 @@ public class ReLU implements ActivationFunction {
         return x >= 0 ? 1 : 0;
     }
 
+    @Override
+    public String toString() {
+        return "relu";
+    }
+
 }

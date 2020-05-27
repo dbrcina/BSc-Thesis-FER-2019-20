@@ -9,6 +9,9 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
 import javax.swing.*;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Function;
 
@@ -198,6 +201,13 @@ public class NeuralNetwork {
 
     public void train(int epochs, double maxError, double eta) {
         stop = false;
+        PrintWriter writer = null;
+        try {
+            writer = new PrintWriter(
+                    new File(learningType + "_" + aFunction + "_" + Arrays.toString(layers)) + ".csv");
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
         System.out.println("Starting " + learningType + " backpropagation.");
 
         // randomize weights and biases
@@ -254,7 +264,7 @@ public class NeuralNetwork {
                         biasesUpdatesPerLayer, 0, biasesPerLayer, 0, biasesUpdatesPerLayer.length);
             }
             /* ---------------------- */
-
+            if (epoch % 25 == 0) writer.println(epoch + "," + error);
             /* check accumulated error and print results */
             if (stop) break;
             error = error / (2 * numberOfSamples);
@@ -262,6 +272,7 @@ public class NeuralNetwork {
             if (epoch == 0 || exit || (epoch + 1) % 1000 == 0) {
                 System.out.println("Epoch " + (epoch + 1) + "., error = " + error);
                 if (exit) {
+                    writer.println(epoch + "," + error);
                     System.out.println("Found closest error! Exiting...");
                     break;
                 }
@@ -272,6 +283,7 @@ public class NeuralNetwork {
         if (stop) {
             System.out.println("Stopped.");
         }
+        writer.flush();
     }
 
     /* PREPARE BATCHES OF SAMPLES BASED ON LEARNING TYPE */
@@ -338,11 +350,11 @@ public class NeuralNetwork {
             RealMatrix deltasLayerK = deltasPerLayer[k];
             double[] weightedSums = (weightsLayerK1.transpose().multiply(deltasLayerK1)).getColumn(0);
             // add biases
-            for (int i = 0; i < weightedSums.length; i++) {
+            /*for (int i = 0; i < weightedSums.length; i++) {
                 for (int j = 0; j < biasesLayerK1.getDimension(); j++) {
                     weightedSums[i] += biasesLayerK1.getEntry(j) * deltasLayerK1.getEntry(j, 0);
                 }
-            }
+            }*/
             // apply derivatives
             for (int i = 0; i < deltasLayerK.getRowDimension(); i++) {
                 deltasLayerK.setEntry(i, 0, derivativesLayerK.getEntry(i) * weightedSums[i]);

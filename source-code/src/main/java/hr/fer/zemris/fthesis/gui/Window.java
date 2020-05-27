@@ -355,7 +355,7 @@ public class Window extends JFrame {
         public CanvasComponent(Window window, int width, int height) {
             this.window = window;
             setPreferredSize(new Dimension(width, height));
-            setBorder(new TitledBorder(new EtchedBorder(), "Canvas"));
+            setBorder(new TitledBorder(new EtchedBorder(), "Sample space"));
         }
 
         @Override

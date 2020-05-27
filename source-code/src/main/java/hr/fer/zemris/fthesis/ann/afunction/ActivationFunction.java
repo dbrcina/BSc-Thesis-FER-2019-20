@@ -6,4 +6,6 @@ public interface ActivationFunction {
 
     double derivativeValueAt(double x);
 
+    String toString();
+
 }
