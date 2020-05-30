@@ -6,9 +6,11 @@
 \usepackage{pdfpages}
 \usepackage{algorithm}
 \usepackage{xcolor}
+\usepackage{listings}
 
 \definecolor{myblue}{RGB}{68, 114, 196}
 \definecolor{mygreen}{RGB}{0, 176, 80}
+\lstset{language=Java, tabsize=2}
 
 \begin{document}
 
@@ -23,24 +25,29 @@
 \includepdf[pages=-]{zadatak}
 
 % Dodavanje zahvale ili prazne stranice. Ako ne želite dodati zahvalu, naredbu ostavite radi prazne stranice.
-\zahvala{}
+\zahvala{Zahvaljujem mentoru Marku na slobodi odabira teme za ovaj rad i na mnoštvu ukazanih literatura.}
 
 \tableofcontents
 
 \chapter{Uvod}
-Uvod rada. Nakon uvoda dolaze poglavlja u kojima se obrađuje tema.
+Projektiranje sustava koji samostalno uče je osnovni problem moderne računarske znanosti. Sam postupak učenja ne predstavlja toliki problem koliko modeliranje raznih modela koje je potrebno naučiti te odabira dobrog algoritma iz palete mnoštva. Često se moramo pitati što točno želimo da sustav čini te koje onda postupke umjetne inteligencije možemo iskoristiti. Najbanalniji primjer je prepoznavanje sadržaja slike na kojoj se može nalaziti mnoštvo sadržaja. Npr. prepoznavanje rukom pisanih brojeva, razlikovanje ljudi od životinja i neživih stvari itd.
+
+U ovom radu ćemo se dotaknuti teorijske podloge jednog od algoritama umjetne inteligencije, točnije nadziranog učenja, u svrhu kreiranja jednog jednostavnog klasifikatora koji će razviti svojstvo raspoznavanja razreda na temelju 2D koordinata.
+
+\bigskip
+U drugom poglavlju dan je kratak pregled područja umjetne inteligencije i strojnog učenja. U trećem poglavlju detaljnije je prikazana teorijska podloga nadziranog učenja. Četvrto poglavlje opisuje algoritam umjetne neuronske mreže kroz povijest do danas te njegova razna svojstva i primjene. U petom poglavlju su prikazani rezultati programske implementacije koji potkrepljuju teoriju četvrtog poglavlja.
 
 \chapter{{Pregled područja}}
 Pitate li se ikada što je to inteligencija te čemu nam služi. To pitanje postavljeno je još za vrijeme začetka filozofije kao znanosti kada su se tadašnji filozofi pitali kako i na koji način je ljudsko razmišljanje, učenje i pamćenje ostvareno. Ni dan danas ne postoji jednoznačan odgovor na to pitanje jer ljudski mozak i dalje predstavlja jednu veliku nepoznanicu koja vjerojatno nikada ili ne tako skoro neće biti razriješena. No znanost je podosta napredovala i shodno tomu se razvila želja da se ljudska inteligencija pokuša pretočiti u nekakvu vrstu inteligencije strojeva.
 
-Početak ovakvog razmišljanja datira od 50-tih godina dvadesetog stoljeća kada Alan Turing u članku \textit{Computing Machinery and Intelligence} časopisa \textit{Mind} postavlja pitanje: Mogu li strojevi misliti? \engl{Can machines think?} na koje pokušava odgovoriti kroz tzv. igru imitacije \engl{imitation game}. Sudionici igre su tri igrača: igrač A, igrač B i igrač C gdje su igrači A i B ispitanici a igrač C ispitivač. Cilj igrača C je utvrditi spol ispitanika postavljanjem pitanja, cilj igrača B je pomoći ispitivaču C a cilj igrača A je navesti ispitivača C na pogrešnu identifikaciju. Što će se dogoditi ako stroj uzme mjesto igrača A? Ako broj pogrešaka igrača C bude gotovo jednak u oba slučaja, onda je stroj inteligentan. \citep{turingAI}. Ovakav princip se često naziva turingov test \engl{Turing test}.
+Početak ovakvog razmišljanja datira od 50-tih godina dvadesetog stoljeća kada Alan Turing u članku \textit{Computing Machinery and Intelligence} časopisa \textit{Mind} postavlja pitanje: Mogu li strojevi misliti? \engl{Can machines think?} na koje pokušava odgovoriti kroz tzv. igru imitacije \engl{imitation game}. Sudionici igre su tri igrača: igrač A, igrač B i igrač C gdje su igrači A i B ispitanici a igrač C ispitivač. Cilj igrača C je utvrditi spol ispitanika postavljanjem pitanja, cilj igrača B je pomoći ispitivaču C a cilj igrača A je navesti ispitivača C na pogrešnu identifikaciju. Što će se dogoditi ako stroj uzme mjesto igrača A? Ako broj pogrešaka igrača C bude gotovo jednak u oba slučaja, onda je stroj inteligentan. \citep{turingAI}. Ovakav princip testiranja se često naziva Touringov test \engl{Turing test}.
 
-Nedugo nakon turingovog eksperimenta, 1956. se održava konferencija u Dartmouthu \citep{wiki:DART} na inicijativu John McCarthy-a, tadašnjeg mladog profesora matematike na fakultetu u Dartmouthu, koji okuplja oko sebe nekolicinu znanstvenika i prijatelja kako bi pokušali koncepte ljudske inteligencije preslikati u inteligenciju strojeva. Cilj je pokazati kako strojevi koriste jezik, kako zaključuju i stvaraju apstraktne koncepte i kako vremenom postaju sve prilagodljiviji na predočene probleme baš kao i ljudi. Inicijalna ideja je bila da se neki od navedenih problema može dokazati uz manju skupinu dobrih znanstvenika i kroz period od jednog ljeta (McCarthy et al. 1955). To naravno nije bilo moguće. Time se formalno uvodi pojam \textit{umjetna inteligencija}.
+Nedugo nakon Touringov eksperimenta, 1956. se održava konferencija u Dartmouthu \citep{wiki:DART} na inicijativu John McCarthy-a, tadašnjeg mladog profesora matematike na fakultetu u Dartmouthu, koji okuplja oko sebe nekolicinu znanstvenika i prijatelja kako bi pokušali koncepte ljudske inteligencije preslikati u inteligenciju strojeva. Cilj je pokazati kako strojevi koriste jezik, kako zaključuju i stvaraju apstraktne koncepte i kako vremenom postaju sve prilagodljiviji na predočene probleme baš kao i ljudi. Inicijalna ideja je bila da se neki od navedenih problema može dokazati uz manju skupinu dobrih znanstvenika i kroz period od jednog ljeta (McCarthy et al. 1955). To naravno nije bilo moguće. Time se formalno uvodi pojam \textit{umjetna inteligencija}.
 
 \section{Umjetna inteligencija}
-Kao što je anticipirano ranije, umjetna inteligencija \engl{artificial intelligence} je laički rečeno inteligencija strojeva a znanost koja se jednim dijelom bavi proučavanjem umjetne inteligencije jest računarska znanost \engl{computer science}.
+Kao što je anticipirano ranije, umjetna inteligencija \engl{artificial intelligence} je laički rečeno inteligencija strojeva a znanost koja se bavi proučavanjem umjetne inteligencije naziva se računarska znanost \engl{computer science}.
 
-Primjena umjetne inteligencije danas je izrazito rasprostranjena kroz gotovo svaku industriju. Pronalazimo ju u medicini, automobilskoj industriji, robotici, pa i u sportskoj i industriji igara. Jedan od poznatijih događaja koji prikazuje primjenu umjetne inteligencije dogodio se 2016. kada je računalo naziva \textit{AlphaGo} u igri \textit{Go} uspijelo pobijediti svjetskog prvaka Lee Sedolu rezultatom 4:1 te time ostvario velik uspjeh u svijetu umjetne inteligencije kao i pažnju javnosti \citep{moyerGO}.
+Primjena umjetne inteligencije danas je izrazito rasprostranjena kroz gotovo svaku industriju. Pronalazimo ju u medicini, automobilskoj industriji, robotici, pa i u sportskoj i industriji igara. Jedan od poznatijih događaja koji prikazuje primjenu umjetne inteligencije dogodio se 2016. kada je računalo naziva \textit{AlphaGo} u igri \textit{Go} uspjelo pobijediti svjetskog prvaka Lee Sedolu rezultatom 4:1 te time ostvario velik uspjeh u svijetu umjetne inteligencije kao i pažnju javnosti \citep{moyerGO}.
 
 Umjetnu inteligenciju je dakako potrebno trenirati i učiti pa je tako učenje podijeljeno na dvije veće cjeline:
 \begin{center}
@@ -51,7 +58,7 @@ Umjetnu inteligenciju je dakako potrebno trenirati i učiti pa je tako učenje p
 \end{center}
 
 \subsection{Simboličko učenje}
-Simbolička umjetna inteligencija \engl{symbolic artificial intelligence} je izraz koji definira skup istraživačkih metoda koje se temelje na ljudima lako čitljivim simbolima \engl{human-readable simbol} koji modeliraju probleme i logiku. Jedan od najboljih primjera jesu \textit{ekspertni sustavi} koji se temelje na skupu pravila. Pravila su modelirana na sličan način kao i Ako-Onda rečenica \engl{If-Then statement} koja je u ljudskoj komunikaciji svakodnevno u upotrebi. Također, razne vrste logika poput propozicijska \engl{Propositional logic}, često referirana kao Boolova algebra, logika prvog reda \engl{First order logic}, poznatija kao predikatna logika \engl{Predicate logic}, neizrazita logika \engl{Fuzzy logic} pripadaju upravo simboličkoj umjetnoj inteligenciji. Ovakav način učenja bio je popularan početkom 1950. sve do kraja 1980 \citep{wiki:SIMB}.
+Simbolička umjetna inteligencija \engl{symbolic artificial intelligence} je izraz koji definira skup istraživačkih metoda koje se temelje na ljudima lako čitljivim simbolima \engl{human-readable simbol} koji modeliraju probleme i logiku. Jedan od najboljih primjera jesu \textit{ekspertni sustavi} koji se temelje na skupu pravila. Pravila su modelirana na sličan način kao i Ako-Onda rečenica \engl{If-Then statement} koja je u ljudskoj komunikaciji svakodnevno u upotrebi. Također, razne vrste logika poput propozicijska \engl{Propositional logic}, često referirana kao Booleova algebra, logika prvog reda \engl{First order logic}, poznatija kao predikatna logika \engl{Predicate logic}, neizrazita logika \engl{Fuzzy logic} pripadaju upravo simboličkoj umjetnoj inteligenciji. Ovakav način učenja bio je popularan početkom 1950. sve do kraja 1980 \citep{wiki:SIMB}.
 
 \subsection{Strojno učenje}
 Strojno učenje \engl{machine learning, ML} predstavlja niz metoda i algoritama koji sustavima pružaju stjecanje novog znanja kroz modeliranje obrazaca koje onda kasnije mogu iskoristiti za predviđanje novih podataka ili sličnih \citep{cupicML}. Glavna ideja je da sustavi uče iz iskustva, empirijski, bez da se programska implementacija mijenja što znatno olakšava manipulaciju istih.
@@ -80,17 +87,17 @@ Strojno učenje dijelimo na četiri područja:
     \caption[Caption for LOF]{Primjer grupiranja\footnotemark}
     \label{fig:clustering}
 \end{figure}
-\footnotetext{Preuzeto sa https://www.geeksforgeeks.org/clustering-in-machine-learning/.}
+\footnotetext{Preuzeto sa https://www.geeksforgeeks.org/clustering-in-machine-learning/. [Pristupljeno 10-Maj-2020].}
 
 Uz grupiranje poznati postupci su i postupci smanjenja dimenzionalnosti \engl{dimensionality reduction}, postupci otkrivanja stršećih ili novih vrijednosti \engl{outlier detection, novelty detection} i drugi.
 
 \bigskip
 
-\textit{Polu-nadzirano učenje} \engl{semi-supervised learning}, kao što samo ime nalaže, je učenje u kojem se isprepliću koncepti nadzirano učenje sa konceptima nenadziranim učenjem. Ono pokazuje dosta veće uspjehe nego navedeni, izvedba je izrazito zahtjevnija \citep{wiki:SEMISUP}.
+\textit{Polu-nadzirano učenje} \engl{semi-supervised learning}, kao što samo ime nalaže, je učenje u kojem se isprepliću koncepti nadzirano učenje s konceptima nenadziranim učenjem. Ono pokazuje dosta veće uspjehe nego navedeni, no izvedba je izrazito zahtjevnija \citep{wiki:SEMISUP}.
 
 \bigskip
 
-\textit{Podržano učenje} \engl{reinforcement learning, RL} je vrsta učenja koja se potpuno razlikuje od svih do sada navedenih jer ono ne očekuje nikakve tabelirane ulazne ili izlazne podatke već je glavna ideja optimizacija ponašanja računalnih agenata. Razmatra se interakcija agenta sa okolinom \engl{environment} kroz niz akcija za koje isti može biti nagrađen ili kažnjen ovisno o ishodu akcije. Željeni cilj agenta je maksimizirati mogući dobitak nagrade \citep{wiki:RL}. Na slici \ref{fig:reinforcement-learning} prikazan je model podržanog učenja.
+\textit{Podržano učenje} \engl{reinforcement learning, RL} je vrsta učenja koja se potpuno razlikuje od svih do sada navedenih jer ono ne očekuje nikakve tabelirane ulazne ili izlazne podatke već je glavna ideja optimizacija ponašanja računalnih agenata. Razmatra se interakcija agenta s okolinom \engl{environment} kroz niz akcija za koje isti može biti nagrađen ili kažnjen ovisno o ishodu akcije. Željeni cilj agenta je maksimizirati mogući dobitak nagrade \citep{wiki:RL}. Na slici \ref{fig:reinforcement-learning} prikazan je model podržanog učenja.
 
 \begin{figure}[H]
     \centering
@@ -98,10 +105,10 @@ Uz grupiranje poznati postupci su i postupci smanjenja dimenzionalnosti \engl{di
     \caption[Caption for LOF]{Model podržanog učenja\footnotemark}
     \label{fig:reinforcement-learning}
 \end{figure}
-\footnotetext{Preuzeto sa https://www.kdnuggets.com/2018/03/5-things-reinforcement-learning.html/.}
+\footnotetext{Preuzeto sa https://www.kdnuggets.com/2018/03/5-things-reinforcement-learning.html/. [Pristupljeno 10-Maj-2020].}
 
 \chapter{Nadzirano učenje}
-Nadzirano učenje \engl{supervised learning} je vrsta učenja čiji je cilj sve podatke koji dođu na ulaz sustava preslikati u izlaz koji točno odgovara predanim ulazima. Dakle, prije samog učenja poznati su ulazi, koji se često modeliraju vektorima, te izlazi, koji su pridruženi tim ulazima i predstavljaju jedan podatak, stoga se tijekom učenja u svakom trenutku zna željeni izlaz te se za krive rezultate daje određena povratna informacija \engl{feedback} o tome koliko sustav griješi. Upravo zbog navedenog koncepta je učenje i dobilo ime nadzirano učenje jer se proces učenja izvršava uz prisustvo učitelja \engl{supervisor}. Razlikujemo dvije faze strojnog modela prikazane na slici \ref{fig:supervised-learning-flow}:
+Nadzirano učenje \engl{supervised learning} je vrsta učenja čiji je cilj sve uzorke koji dođu na ulaz sustava preslikati u izlaz koji točno odgovara predanim ulazima. Dakle, prije samog učenja poznati su ulazi, koji se često modeliraju vektorima, te izlazi, koji su pridruženi tim ulazima, stoga se tijekom učenja u svakom trenutku zna željeni izlaz te se za krive rezultate daje određena povratna informacija \engl{feedback} o tome koliko sustav griješi. Upravo zbog navedenog koncepta je učenje i dobilo ime nadzirano učenje jer se proces učenja izvršava uz prisustvo učitelja. Razlikujemo dvije faze strojnog modela prikazane na slici \ref{fig:supervised-learning-flow}:
 \begin{enumerate}
     \item faza učenja modela te
     \item faza iskorištavanja modela.
@@ -117,15 +124,12 @@ Nadzirano učenje \engl{supervised learning} je vrsta učenja čiji je cilj sve 
 \end{figure}
 \footnotetext{Preuzeto iz literature \citep{cupicML}.}
 
-Tijekom faze učenja, modelu se predaje skup ulaznih podataka za učenje \engl{training set}. Svaki podatak skupa možemo notirati kao $(\textbf{x}, y)\textsubscript{i}$ što predstavlja \textit{i}-ti primjer iz skupa za učenje gdje \textbf{x} predstavlja vektor ulaznih podataka, a \textit{y} vrijednost pridružena ulaznom vektoru, odnosno oznaku \engl{label}. Ulazni podatak često može biti kompleksne naravi što znači da ga je potrebno "razbiti" u manje cjeline. Takav postupak se naziva vađenje značajki \engl{feature extraction}. Rezultat navedenog je kolekcija značajki koja se zatim predaje određenom algoritmu strojnog učenja. Npr. ulazni podatci mogu biti razne gume poput gume automobila, gume bicikla, gume traktora i sl. a značajka bi onda mogla biti volumen gume, oblik gume, boja gume i sl. Algoritam strojnog učenja će na temelju predanih značajki pokušati optimizirati parametre odabranog modela kako bi se isti mogao koristiti u sljedećoj fazi.
+Tijekom faze učenja, modelu se predaje skup uzoraka za učenje \engl{training set}. Svaki uzorak skupa možemo notirati kao $(\textbf{x}, y)\textsubscript{i}$ što predstavlja \textit{i}-ti uzorak iz skupa za učenje gdje \textbf{x} predstavlja vektor ulaznih podataka, a \textit{y} vrijednost pridružena ulaznom vektoru, odnosno oznaku \engl{label}. Ulazni podatak često može biti kompleksne naravi što znači da ga je potrebno "razbiti" u manje cjeline. Takav postupak se naziva vađenje značajki \engl{feature extraction}. Rezultat navedenog je kolekcija značajki koja se zatim predaje određenom algoritmu strojnog učenja. Npr. ulazni podatci mogu biti razne gume poput gume automobila, gume bicikla, gume traktora i sl. a značajka bi onda mogla biti volumen gume, oblik gume, boja gume i sl. Algoritam strojnog učenja će na temelju predanih značajki pokušati optimizirati parametre odabranog modela kako bi se isti mogao koristiti u sljedećoj fazi.
 
-\bigskip
 
-Faza iskorištavanja modela predstavlja fazu u kojoj se treba utvrditi radi li naučeni model sa podatcima nad kojima nije učio, tj. je li razvio sposobnost generalizacije \engl{generalization}. Ako model dodijeli točnu oznaku za većinu ulaznih podataka, onda možemo reći da je razvio svojstvo generalizacije. No što ako u velikoj mjeri ne uspije točno povezati izlaze sa ulazima? Ako dođe to takve pojave, kažemo da je model pretreniran \engl{overfitting}. Do navedene pojave dolazi kada model nauči previše nad skupom podataka za učenje, tj. podatke za učenje nauči savršeno raspoznavati dok za nove podatke ne uspijeva dati željene rezultate. Postoji nekoliko načina kako se može utjecati da model razvije svojstvo generalizacije a spomenut ćemo samo jedan od njih, \textit{unakrsna provjera}.
+Faza iskorištavanja modela predstavlja fazu u kojoj se treba utvrditi radi li naučeni model s uzorcima nad kojima nije učio, tj. je li razvio sposobnost generalizacije \engl{generalization}. Ako model dodijeli točnu oznaku za većinu ulaznih podataka, onda možemo reći da je razvio svojstvo generalizacije. No što ako u velikoj mjeri ne uspije točno povezati izlaze s ulazima? Ako dođe to takve pojave, kažemo da je model pretreniran \engl{overfitting}. Do navedene pojave dolazi kada model nauči previše nad skupom uzoraka za učenje, tj. uzorke za učenje nauči savršeno raspoznavati dok za nove uzorke ne uspijeva dati željene rezultate. Postoji nekoliko načina kako se može utjecati da model razvije svojstvo generalizacije a spomenut ćemo samo jedan od njih, \textit{unakrsna provjera}.
 
-\bigskip
-
-Unakrsna provjera \engl{cross-validation} je postupak koji se koristi tijekom faze učenja modela. Ideja je da se dio podataka iz skupa za učenje razdijeli u novi skup, skup za provjeru \engl{validation set}. Skup za provjeru često sadrži od 20\% do 30\% svih podataka iz skupa za učenje \citep{cupicML}. Tijekom faze učenja modela, model će i dalje učiti samo nad skupom za učenje dok ćemo mu povremeno dati i podatke iz skupa za provjeru čisto da se vidi koliko griješi nad njima. Važno je napomenuti da model nad podatcima iz skupa za provjeru neće učiti, tj. neće optimizirati parametre već će bit prisiljen da nauči generalizirati. Postavlja se pitanje do kada će faza učenja modela onda trajati i odgovor je vrlo jasan. Trajat će do trenutka kada pogreška nad skupom za provjeru počinje rasti. Dijagram na slici \ref{fig:cross-validation} prikazuje kako model uči kroz epohe\footnote{Epoha je ništa drugo nego jedna iteracija učenja, ali u strojnom učenju se često koristi izraz epoha pa ćemo se držati konvencije.}.
+Unakrsna provjera \engl{cross-validation} je postupak koji se koristi tijekom faze učenja modela. Ideja je da se dio uzoraka iz skupa za učenje razdijeli u novi skup, skup za provjeru \engl{validation set}. Skup za provjeru često sadrži od 20\% do 30\% svih uzoraka iz skupa za učenje \citep{cupicML}. Tijekom faze učenja modela, model će i dalje učiti samo nad skupom za učenje, dok ćemo mu povremeno dati i podatke iz skupa za provjeru čisto da se vidi koliko griješi nad njima. Važno je napomenuti da model nad uzorcima iz skupa za provjeru neće učiti, tj. neće optimizirati parametre već će biti prisiljen da nauči generalizirati. Postavlja se pitanje do kada će faza učenja modela onda trajati i odgovor je vrlo jasan. Trajat će do trenutka kada pogreška nad skupom za provjeru počinje rasti. Dijagram na slici \ref{fig:cross-validation} prikazuje kako model uči kroz epohe\footnote{Epoha je ništa drugo nego jedna iteracija učenja, ali u strojnom učenju se često koristi izraz epoha pa ćemo se držati konvencije.}.
 
 \begin{figure}[H]
     \centering
@@ -819,9 +823,93 @@ gdje navedenu parcijalnu derivaciju opet rješavamo pravilom ulančavanja. Ako d
 \footnotetext{Iz literature \citep{cupicANN}.}
 
 \newpage
-dakle
+Dakle, uvjerili smo se da će izračuni parcijalnih derivaciju uz pomoć backpropagation algoritma biti znatno brži, nego da smo ih pojedinačno računali. Za jednu epohu učenja kroz mrežu je potrebno proći svega dva puta: algoritmom unaprijedne neuronske mreže te backpropagation algoritmom što je vrlo efikasno. Također, uvjet zaustavljanja učenja može biti da funkcija kazne poprimi određeni error kojeg korisnik izvana zada ili jednostavno da se učenje završi nakon određenog broja epoha.
+
+\bigskip
+
+Spomenimo još tri glavna tipa učenja backpropagation algoritmom, a to su:
+\begin{enumerate}
+    \item Skupno učenje \engl{batch learning} - težine se ažuriraju tek kada kroz mrežu prođu svi uzorci, vremenski je dosta zahtjevan, ali je jako precizan.
+    \item Učenje po manjim grupama \engl{mini-batches learning} - težine se ažuriraju nakon što kroz mrežu prođe određen broj uzoraka, vremenski je manje zahtjevan od skupnog, ali je manje precizan.
+    \item Stohastičko učenje \engl{stochastic learning} - težine se ažuriraju nakon svakog uzorka, vremenski je najpovoljnije, ali je nešto neprecizniji od mini-batchesa. Često se naziva i \textit{online} učenje zbog ažuriranja nakon svakog uzorka.
+\end{enumerate}
+
+\bigskip
+\bigskip
+
+U sljedećem poglavlju ćemo pokazati rezultate programske implementacije.
 
 \chapter{Rezultati}
+Programska implementacija ovog rada pisana je programskim jezikom \textit{Java} verzije \textit{13} i pomoćnog alata \textit{Maven} verzije \textit{3.6.3}. Korištena je samo jedna eksterna biblioteka za rad s matricama\footnote{\textit{Apache Commons Math} 3.6.1 \url{http://commons.apache.org/proper/commons-math/}.}, dok je sve ostalo pisano standardnim javinim bibliotekama kao npr. \textit{Swing}.
+
+U sklopu implementacije implementirana je unaprijedna neuronska mreža razredom \textit{NeuralNetwork} koji posjeduje metodu \textit{feedForward} zaslužnu za dobivanje izlaza za neki ulaz te metodom \textit{train} koja trenira istu algoritmom backpropagation. U nastavku su prikazane signature metoda.
+\begin{lstlisting}
+public class NeuralNetwork {
+    ...
+    public double[] feedForward(double[] inputs) {...}
+    public void train(
+        int epochs, double maxError, double eta) {...}
+    ...
+}
+\end{lstlisting}
+Također, implementirano je i jedno grafičko korisničko sučelje (\textit{GUI}) koje je prikazano na slici \ref{fig:gui}. GUI je dosta samodokumentirajući, ali spomenimo par sitnica. Mreži se za učenje predaju uzorci iz 2D koordinatnog sustava koji se unose klikom lijevog miša, dok se klikom desnog miša mijenja tip razreda kao što je navedeno pod \textbf{Class type}. Mogu se izabrati tri tipa backpropagation algoritma koje smo spomenuli ranije. S obzirom da mreža ima fiksne ulaze (2 ulaza: x i y koordinata točke) i fiksne izlaze (3 izlaza jer su omogućene tri vrste razreda), omogućeno je postavljanje samo skrivenih slojeva. Ostale karakteristike sučelja bi trebale biti jasne. Potvrdimo teoriju ovog rada na temelju sljedećih nekoliko primjera.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/gui.png}
+    \caption[Caption for LOF]{Grafičko korisničko sučelje}
+    \label{fig:gui}
+\end{figure}
+
+Krenimo sa jednoslojnim perceptronom i linearnom klasifikacijom prikazanom na slici \ref{fig:single-layer-class}. Korištena aktivacijska funkcija u ovom slučaju je ReLU, no sve tri navedene daju donekle sličan rezultat što se tiče oblika decizijske granice jer se radi o linearnoj klasifikacija gdje nema previše mudrovanja.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/single-layer.png}
+    \caption[Caption for LOF]{Linearna klasifikacija - jednoslojni perceptron}
+    \label{fig:single-layer-class}
+\end{figure}
+
+Pogledajmo što će se dogoditi ako problem nije linearno interpretabilan ako i dalje koristimo jednoslojni perceptron. Rezultat je prikazan na slici \ref{fig:single-layer-fail}. Vidimo da je klasifikator neke točke dobro klasificirao, a neke nije te smo time upravo dokazali da jednoslojni perceptron nije u stanju kvalitetno riješiti probleme koji nisu linearno interpretabilni.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/single-layer-fail.png}
+    \caption[Caption for LOF]{Nelinearna klasifikacija - jednoslojni perceptron}
+    \label{fig:single-layer-fail}
+\end{figure}
+
+Pogledajmo sada kako bi višeslojni perceptron riješio isti problem. Rezultat je prikazan na slici \ref{fig:tanh-multilayer}. Korišten je tangens hiperbolni kao aktivacijska funkcija jer je davala najbolje rezultate za trenutni problem i korišten je tip učenja u grupama (\textit{mini-batches}), gdje se svaka grupa sastoji od maksimalno 30 uzoraka. Arhitektura mreže sada glasi 2x5x3, što znači da smo dodali jedan skriveni sloj od 5 neurona. No, i dalje nismo zadovoljni kako klasifikator radi pa probajmo mrežu učiniti još ekspresivnijom dodavši joj još slojeva i neurona.
+
+Na slici \ref{fig:relu-multilayer} prikazani su nešto bolji rezultati nego ranije jer smo mrežu učinili nešto ekspresivnijom dodavši joj još jedan skriveni sloj od 5 neurona i promijenivši tip backpropagation algoritma u stochastic kao i aktivacijsku funkciju u ReLU. Također, možemo vidjeti kako ReLU funkcija utječe na izgled decizijskih granica čineći grupirane razrede kao pravokutne likove. Pogledajmo možemo li klasifikator još bolje naučiti i ispostavlja se da možemo, no što je mreža ekspresivnija time će se klasifikator pretrenirati samo nad uzorcima za učenje te time neće razviti svojstvo generalizacije i neće biti primjenjiv izvan predstavljenog problema, a to je jako loša praksa. Rezultati su prikazani na slikama \ref{fig:sigmoid-almost-best} i \ref{fig:overfitting}. Uočite arhitekture neuronske mreže kao i maksimalan error za koji se prekida učenje.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/tanh-better.png}
+    \caption[Caption for LOF]{Nelinearna klasifikacija - višeslojni perceptron}
+    \label{fig:tanh-multilayer}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/relu-better-better.png}
+    \caption[Caption for LOF]{Nelinearna klasifikacija - bolje}
+    \label{fig:relu-multilayer}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/sigmoid-almost-best.png}
+    \caption[Caption for LOF]{Nelinearna klasifikacija - još bolje}
+    \label{fig:sigmoid-almost-best}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{img/overfitting.png}
+    \caption[Caption for LOF]{Pretreniranost}
+    \label{fig:overfitting}
+\end{figure}
 
 \chapter{Zaključak}
 Zaključak.
