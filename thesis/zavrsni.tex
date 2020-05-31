@@ -912,22 +912,29 @@ Na slici \ref{fig:relu-multilayer} prikazani su nešto bolji rezultati nego rani
 \end{figure}
 
 \chapter{Zaključak}
-Zaključak.
+Kroz ovaj rad obrađen je algoritam unparijedne umjetne neuronske mreže i učenje iste algoritmom propagacije pogreške unatrag.
+
+Najveći problem u realizaciji jednog takvog algoritma predstavlja upravo pametna inicijalizacija težina među neuronima, izbor aktivacijskih funkcija i arhitektura same mreže. Često moramo jako dobro poznavati teoriju koja se krije iza kulisa da bi se mogli suočiti s mnoštvom različitih problema na prihvatljiv način, inače možemo unedogled vrtjeti algoritam bez kvalitetnih rezultata.
+
+Unatoč svemu, implementacija ovog rada je dosta uspješno realizirana i model klasifikatora za različite aktivacijske funkcije daje dosta dobre rezultate.
+
+\bigskip
+Za daljnji nastavak ovog rada bi se moglo proučiti mnoštvo različitih inačica backpropagation algoritma u svrhu postizanja boljih rezultata i upoznati se s dubokim neuronskim mrežama i algoritmima dubokog učenja.
 
 \bibliography{literatura}
 \bibliographystyle{fer}
 
 \begin{sazetak}
-Sažetak na hrvatskom jeziku.
+Raspoznavanje uzoraka te klasifikacija istih je jedan od bitnijih problema računarske znanosti. Najveći izazov je konstruirati kvalitetan klasifikator koji je sposoban generalizirati. U ovom radu prikazan je teorijski pogled na algoritam umjetne neuronske mreže kroz povijest pa do danas i njegovo učenje backpropagation algoritmom. Također, uz rad je i implementirano jedno takvo učenje kroz grafičko korisničko sučelje kroz koje korisnik interaktivno unosi točke iz 2D koordinatnog sustava labeliranih različitim razredima i prati koliko kvalitetno klasifikator uči. Reprezentativni rezultati prikazani su i dokumentirani u radu.
 
-\kljucnerijeci{Ključne riječi, odvojene zarezima.}
+\kljucnerijeci{Nadzirano učenje, klasifikacija, unaprijedna neuronska mreža, algoritam propagacije pogreške unatrag, aktivacijska funkcija.}
 \end{sazetak}
 
 \engtitle{Classification Based on Artificial Neural Networks}
 \begin{abstract}
-Abstract.
+Pattern recognition and classification is one of the most important problems in computer science. The biggest challenge is to construct a quality classifier that is capable of generalizing. This paper presents a theoretical view of the artificial neural network algorithm through history to the present day and its learning by the backpropagation algorithm. Also, in addition to the work, one such learning was implemented through a graphical user interface through which the user interactively enters points from the 2D coordinate system labeled with different classes and monitors how well the classifier learns. Representative results are presented and documented in the paper.
 
-\keywords{Keywords.}
+\keywords{Supervised learning, classification, feedforward neural network, backpropagation, activation function.}
 \end{abstract}
 
 \end{document}
