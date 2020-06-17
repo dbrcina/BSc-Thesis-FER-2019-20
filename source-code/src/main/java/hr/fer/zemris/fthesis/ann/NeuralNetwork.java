@@ -153,9 +153,9 @@ public class NeuralNetwork {
                     weight *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
                     weightsLayerK.setEntry(i, j, weight);
                 }
-                //double bias = rand.nextGaussian();
-                //bias *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
-                biasesLayerK.setEntry(i, 0, 0.0);
+                double bias = rand.nextGaussian();
+                bias *= Math.sqrt(2.0 / weightsLayerK.getColumnDimension());
+                biasesLayerK.setEntry(i, 0, bias);
             }
         }
     }
@@ -201,13 +201,13 @@ public class NeuralNetwork {
 
     public void train(int epochs, double maxError, double eta) {
         stop = false;
-        PrintWriter writer = null;
+        /*PrintWriter writer = null;
         try {
             writer = new PrintWriter(
                     new File(learningType + "_" + aFunction + "_" + Arrays.toString(layers)) + ".csv");
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-        }
+        }*/
         System.out.println("Starting " + learningType + " backpropagation.");
 
         // randomize weights and biases
@@ -264,7 +264,7 @@ public class NeuralNetwork {
                         biasesUpdatesPerLayer, 0, biasesPerLayer, 0, biasesUpdatesPerLayer.length);
             }
             /* ---------------------- */
-            if (epoch % 25 == 0) writer.println(epoch + "," + error);
+            //if (epoch % 25 == 0) writer.println(epoch + "," + error);
             /* check accumulated error and print results */
             if (stop) break;
             error = error / (2 * numberOfSamples);
@@ -272,7 +272,7 @@ public class NeuralNetwork {
             if (epoch == 0 || exit || (epoch + 1) % 1000 == 0) {
                 System.out.println("Epoch " + (epoch + 1) + "., error = " + error);
                 if (exit) {
-                    writer.println(epoch + "," + error);
+                    //writer.println(epoch + "," + error);
                     System.out.println("Found closest error! Exiting...");
                     break;
                 }
@@ -283,7 +283,7 @@ public class NeuralNetwork {
         if (stop) {
             System.out.println("Stopped.");
         }
-        writer.flush();
+        //writer.flush();
     }
 
     /* PREPARE BATCHES OF SAMPLES BASED ON LEARNING TYPE */

@@ -8,10 +8,7 @@ import hr.fer.zemris.fthesis.ann.afunction.Tanh;
 import hr.fer.zemris.fthesis.ann.dataset.Cartesian2DDataset;
 import hr.fer.zemris.fthesis.ann.dataset.ReadOnlyDataset;
 import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
-import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassA;
-import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassB;
-import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassC;
-import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassType;
+import hr.fer.zemris.fthesis.ann.dataset.model.classes.*;
 import hr.fer.zemris.fthesis.util.Rectangle2D;
 
 import javax.swing.*;
@@ -36,6 +33,7 @@ public class Window extends JFrame {
     private ActivationFunction aFunction;
     private final ReadOnlyDataset dataset = new Cartesian2DDataset();
     private final List<Sample> samples = new ArrayList<>();
+    private final List<Sample> normalized = new ArrayList<>();
     private final List<ActivationFunction> aFunctions = List.of(
             new Sigmoid(), new ReLU(), new Tanh());
     // ---------------------------- //
@@ -254,7 +252,7 @@ public class Window extends JFrame {
                 }
             }
             nn.setAFunction(aFunction);
-            List<Sample> normalized = new ArrayList<>();
+            normalized.clear();
             for (Sample s : samples) {
                 double[] sInputs = s.getInputs();
                 double[] inputs = {transformX(sInputs[0]), transformY(sInputs[1])};
@@ -379,18 +377,24 @@ public class Window extends JFrame {
                 double[] inputs = sample.getInputs();
                 int x = (int) inputs[0] - grid.x;
                 int y = (int) inputs[1] - grid.y;
-                int width = 5;
-                int height = 5;
+                int width = 8;
+                int height = 8;
                 ClassType classType = sample.getClassType();
                 Shape shape = classType.createShape(new Rectangle2D(x - width / 2, y - height / 2, width,
                         height));
                 if (training) {
                     g2d.setColor(Color.WHITE);
                     g2d.draw(shape);
+                    double[] outputs = window.nn.feedForward(
+                            new double[]{window.transformX(inputs[0]), window.transformY(inputs[1])});
+                    ClassType actualClass = ClassType.forOutputs(outputs);
+                    if (!classType.equals(actualClass)) {
+                        g2d.setColor(Color.BLACK);
+                    }
                 } else {
                     g2d.setColor(classType.getColor());
-                    g2d.fill(shape);
                 }
+                g2d.fill(shape);
             }
         }
 

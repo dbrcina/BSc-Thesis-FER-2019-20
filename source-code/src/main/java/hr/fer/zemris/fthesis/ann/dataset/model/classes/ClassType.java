@@ -30,6 +30,19 @@ public abstract class ClassType {
         return color;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ClassType)) return false;
+        ClassType classType = (ClassType) o;
+        return Arrays.equals(outputs, classType.outputs);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(outputs);
+    }
+
     private void darkenColorFor(double[] outputs) {
         int r = (int) (outputs[0] * 255);
         int g = (int) (outputs[1] * 255);

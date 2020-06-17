@@ -2,6 +2,8 @@ package hr.fer.zemris.fthesis.ann.dataset.model;
 
 import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassType;
 
+import java.util.Arrays;
+
 /**
  * Models one sample used for training ANN. Each sample consists of:
  * <ul>
@@ -35,6 +37,10 @@ public class Sample {
 
     public void setClassType(ClassType classType) {
         this.classType = classType;
+    }
+
+    public boolean isCorrectClassified() {
+        return Arrays.equals(outputs, classType.getOutputs());
     }
 
 }

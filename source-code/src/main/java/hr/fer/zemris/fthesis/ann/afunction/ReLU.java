@@ -9,7 +9,7 @@ public class ReLU implements ActivationFunction {
 
     @Override
     public double derivativeValueAt(double x) {
-        return x >= 0 ? 1 : 0;
+        return x > 0 ? 1 : 0;
     }
 
     @Override
