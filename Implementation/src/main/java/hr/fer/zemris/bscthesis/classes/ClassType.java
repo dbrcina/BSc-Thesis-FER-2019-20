@@ -184,7 +184,7 @@ public abstract class ClassType {
     }
 
     /**
-     * Dynamically initialize maps that store information about classes and their desired outputs.
+     * Dynamically initializes the maps that store information about classes and their desired outputs.
      * Configuration is in <b>.class-types-config</b> file, which is in resources folder.
      * <br>
      * If something goes wrong, program will be terminated.
@@ -205,7 +205,7 @@ public abstract class ClassType {
                 );
             }
             for (Map.Entry<String, double[]> entry : desiredOutputsForClasses.entrySet()) {
-                Class<ClassType> clazz = (Class<ClassType>) Class.forName(entry.getKey());
+                Class<? extends ClassType> clazz = (Class<? extends ClassType>) Class.forName(entry.getKey());
                 classesForDesiredOutputs.put(
                         Arrays.stream(entry.getValue()).boxed().collect(Collectors.toList()),
                         clazz);
