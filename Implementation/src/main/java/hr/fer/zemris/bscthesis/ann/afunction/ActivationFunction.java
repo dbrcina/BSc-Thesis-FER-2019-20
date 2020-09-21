@@ -1,4 +1,4 @@
-package hr.fer.zemris.fthesis.ann.afunction;
+package hr.fer.zemris.bscthesis.ann.afunction;
 
 public interface ActivationFunction {
 

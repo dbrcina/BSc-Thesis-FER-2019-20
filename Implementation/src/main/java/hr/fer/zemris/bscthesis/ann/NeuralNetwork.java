@@ -1,17 +1,14 @@
-package hr.fer.zemris.fthesis.ann;
+package hr.fer.zemris.bscthesis.ann;
 
-import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.fthesis.ann.dataset.ReadOnlyDataset;
-import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
+import hr.fer.zemris.bscthesis.ann.afunction.ActivationFunction;
+import hr.fer.zemris.bscthesis.ann.dataset.ReadOnlyDataset;
+import hr.fer.zemris.bscthesis.ann.dataset.model.Sample;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.linear.RealVector;
 
 import javax.swing.*;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
 import java.util.*;
 import java.util.function.Function;
 

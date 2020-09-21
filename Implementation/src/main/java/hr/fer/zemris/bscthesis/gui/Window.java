@@ -1,15 +1,17 @@
-package hr.fer.zemris.fthesis.gui;
+package hr.fer.zemris.bscthesis.gui;
 
-import hr.fer.zemris.fthesis.ann.NeuralNetwork;
-import hr.fer.zemris.fthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.fthesis.ann.afunction.ReLU;
-import hr.fer.zemris.fthesis.ann.afunction.Sigmoid;
-import hr.fer.zemris.fthesis.ann.afunction.Tanh;
-import hr.fer.zemris.fthesis.ann.dataset.Cartesian2DDataset;
-import hr.fer.zemris.fthesis.ann.dataset.ReadOnlyDataset;
-import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
-import hr.fer.zemris.fthesis.ann.dataset.model.classes.*;
-import hr.fer.zemris.fthesis.util.Rectangle2D;
+import hr.fer.zemris.bscthesis.ann.NeuralNetwork;
+import hr.fer.zemris.bscthesis.ann.afunction.ActivationFunction;
+import hr.fer.zemris.bscthesis.ann.afunction.ReLU;
+import hr.fer.zemris.bscthesis.ann.afunction.Sigmoid;
+import hr.fer.zemris.bscthesis.ann.afunction.Tanh;
+import hr.fer.zemris.bscthesis.ann.dataset.Cartesian2DDataset;
+import hr.fer.zemris.bscthesis.ann.dataset.ReadOnlyDataset;
+import hr.fer.zemris.bscthesis.ann.dataset.model.Sample;
+import hr.fer.zemris.bscthesis.classes.ClassA;
+import hr.fer.zemris.bscthesis.classes.ClassB;
+import hr.fer.zemris.bscthesis.classes.ClassC;
+import hr.fer.zemris.bscthesis.classes.ClassType;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -315,7 +317,7 @@ public class Window extends JFrame {
                     fldClassType.setText(currentClassType.toString());
                 } else {
                     double[] inputs = {e.getX(), e.getY()};
-                    double[] outputs = currentClassType.getOutputs();
+                    double[] outputs = currentClassType.getDesiredOutputs();
                     Sample sample = new Sample(inputs, outputs);
                     sample.setClassType(currentClassType);
                     samples.add(sample);
@@ -358,7 +360,7 @@ public class Window extends JFrame {
 
         @Override
         protected void paintComponent(Graphics g) {
-            Rectangle2D grid = rectangularGrid();
+            Rectangle grid = rectangularGrid();
             Graphics2D g2d = (Graphics2D) g.create(grid.x, grid.y, grid.width, grid.height);
 
             // clear background
@@ -371,7 +373,7 @@ public class Window extends JFrame {
             drawControlPoints(g2d, grid, window.training);
         }
 
-        private void drawControlPoints(Graphics2D g2d, Rectangle2D grid, boolean training) {
+        private void drawControlPoints(Graphics2D g2d, Rectangle grid, boolean training) {
             g2d.setStroke(new BasicStroke(2));
             for (Sample sample : window.samples) {
                 double[] inputs = sample.getInputs();
@@ -380,14 +382,14 @@ public class Window extends JFrame {
                 int width = 8;
                 int height = 8;
                 ClassType classType = sample.getClassType();
-                Shape shape = classType.createShape(new Rectangle2D(x - width / 2, y - height / 2, width,
+                Shape shape = classType.createShape(new Rectangle(x - width / 2, y - height / 2, width,
                         height));
                 if (training) {
                     g2d.setColor(Color.WHITE);
                     g2d.draw(shape);
                     double[] outputs = window.nn.feedForward(
                             new double[]{window.transformX(inputs[0]), window.transformY(inputs[1])});
-                    ClassType actualClass = ClassType.forOutputs(outputs);
+                    ClassType actualClass = ClassType.determineFor(outputs);
                     if (!classType.equals(actualClass)) {
                         g2d.setColor(Color.BLACK);
                     }
@@ -398,26 +400,26 @@ public class Window extends JFrame {
             }
         }
 
-        private void drawTraining(Graphics2D g2d, Rectangle2D grid) {
+        private void drawTraining(Graphics2D g2d, Rectangle grid) {
             for (int x = 0; x < grid.width; x++) {
                 for (int y = 0; y < grid.height; y++) {
                     double[] inputs = {1.0 * x / grid.width, 1.0 * y / grid.height};
                     double[] outputs = window.nn.feedForward(inputs);
-                    ClassType classType = ClassType.forOutputs(outputs);
+                    ClassType classType = ClassType.determineFor(outputs);
                     g2d.setColor(classType.getColor());
                     g2d.fillRect(x, y, 2, 2);
                 }
             }
         }
 
-        private Rectangle2D rectangularGrid() {
+        private Rectangle rectangularGrid() {
             Insets insets = getInsets();
             Dimension dimension = getSize();
             int x = insets.left;
             int y = insets.top;
             int width = dimension.width - insets.left - insets.right - 1;
             int height = dimension.height - insets.top - insets.bottom;
-            return new Rectangle2D(x, y, width, height);
+            return new Rectangle(x, y, width, height);
         }
 
     }

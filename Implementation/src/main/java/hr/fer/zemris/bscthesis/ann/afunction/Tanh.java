@@ -1,21 +1,21 @@
-package hr.fer.zemris.fthesis.ann.afunction;
+package hr.fer.zemris.bscthesis.ann.afunction;
 
-public class Sigmoid implements ActivationFunction {
+public class Tanh implements ActivationFunction {
 
     @Override
     public double valueAt(double x) {
-        return 1 / (1 + Math.exp(-x));
+        return Math.tanh(x);
     }
 
     @Override
     public double derivativeValueAt(double x) {
         double temp = valueAt(x);
-        return temp * (1 - temp);
+        return 1 - temp * temp;
     }
 
     @Override
     public String toString() {
-        return "sigmoid";
+        return "tanh";
     }
 
 }

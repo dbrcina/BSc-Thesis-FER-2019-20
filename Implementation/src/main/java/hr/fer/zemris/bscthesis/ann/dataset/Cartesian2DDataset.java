@@ -1,6 +1,6 @@
-package hr.fer.zemris.fthesis.ann.dataset;
+package hr.fer.zemris.bscthesis.ann.dataset;
 
-import hr.fer.zemris.fthesis.ann.dataset.model.Sample;
+import hr.fer.zemris.bscthesis.ann.dataset.model.Sample;
 
 import java.nio.file.Path;
 import java.util.LinkedList;

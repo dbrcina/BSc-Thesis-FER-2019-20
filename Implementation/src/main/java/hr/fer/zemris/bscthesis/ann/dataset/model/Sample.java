@@ -1,6 +1,6 @@
-package hr.fer.zemris.fthesis.ann.dataset.model;
+package hr.fer.zemris.bscthesis.ann.dataset.model;
 
-import hr.fer.zemris.fthesis.ann.dataset.model.classes.ClassType;
+import hr.fer.zemris.bscthesis.classes.ClassType;
 
 import java.util.Arrays;
 
@@ -40,7 +40,7 @@ public class Sample {
     }
 
     public boolean isCorrectClassified() {
-        return Arrays.equals(outputs, classType.getOutputs());
+        return Arrays.equals(outputs, classType.getDesiredOutputs());
     }
 
 }
