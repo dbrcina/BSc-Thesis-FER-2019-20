@@ -1,6 +1,7 @@
 package hr.fer.zemris.bscthesis.ann;
 
 import hr.fer.zemris.bscthesis.ann.afunction.ActivationFunction;
+import hr.fer.zemris.bscthesis.ann.afunction.Softmax;
 import hr.fer.zemris.bscthesis.dataset.Dataset;
 import hr.fer.zemris.bscthesis.dataset.Sample;
 import org.apache.commons.math3.linear.ArrayRealVector;
@@ -184,13 +185,18 @@ public class NeuralNetwork {
             if (k != weightsPerLayer.length - 1) {
                 // apply activation function to hidden layers
                 outputsPerLayer[k + 1].setColumn(
-                        0, Arrays.stream(weightedSums).map(aFunction::valueAt).toArray());
+                        0, Arrays.stream(weightedSums).map(aFunction::value).toArray());
                 derivativesPerLayer[k].setColumn(
-                        0, Arrays.stream(weightedSums).map(aFunction::derivativeValueAt).toArray());
+                        0, Arrays.stream(weightedSums).map(aFunction::derivativeValue).toArray());
             } else {
                 // apply softmax to outputs
-                outputsPerLayer[k + 1].setColumn(0, SOFTMAX.apply(weightedSums));
-                derivativesPerLayer[k].setColumn(0, SOFTMAX_DERIVATIVE.apply(weightedSums));
+                ActivationFunction softmax = new Softmax(weightedSums);
+                for (int i = 0; i < weightedSums.length; i++) {
+                    outputsPerLayer[k + 1].setEntry(i, 0, softmax.value(weightedSums[i]));
+                    derivativesPerLayer[k].setEntry(i, 0, softmax.derivativeValue(weightedSums[i]));
+                }
+//                outputsPerLayer[k + 1].setColumn(0, SOFTMAX.apply(weightedSums));
+//                derivativesPerLayer[k].setColumn(0, SOFTMAX_DERIVATIVE.apply(weightedSums));
             }
         }
         return outputsPerLayer[outputsPerLayer.length - 1].getColumn(0);
