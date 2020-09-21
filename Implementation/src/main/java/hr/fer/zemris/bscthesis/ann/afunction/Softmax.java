@@ -11,6 +11,15 @@ public class Softmax implements ActivationFunction {
 
     private final double sum;
 
+    /**
+     * It expects a vector of values from which sum is calculated as follows:
+     * <pre>
+     *     vector: [a1, a2, ..., an]
+     *     sum = Math.exp(a1) + Math.exp(a2) + ... + Math.exp(an)
+     * </pre>
+     *
+     * @param vector vector.
+     */
     public Softmax(double[] vector) {
         sum = Arrays.stream(vector)
                 .map(Math::exp)
