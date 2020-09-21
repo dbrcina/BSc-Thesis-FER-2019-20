@@ -9,6 +9,8 @@ import hr.fer.zemris.bscthesis.classes.ClassType;
  *     <li>outputs,</li>
  *     <li>class type - {@link ClassType}.</li>
  * </ul>
+ *
+ * @author dbrcina
  */
 public class Sample {
 

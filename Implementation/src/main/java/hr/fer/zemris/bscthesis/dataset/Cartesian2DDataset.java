@@ -7,6 +7,8 @@ import java.util.function.Consumer;
 /**
  * An implementation of {@link Dataset}. It receives a collection of {@link Sample}s through
  * {@link #setSamples(List)} method where inputs are represented by 2D points from Cartesian coordinate system.
+ *
+ * @author dbrcina
  */
 public class Cartesian2DDataset implements Dataset {
 
