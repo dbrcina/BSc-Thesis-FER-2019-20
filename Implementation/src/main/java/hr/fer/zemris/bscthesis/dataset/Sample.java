@@ -1,46 +1,53 @@
-package hr.fer.zemris.bscthesis.ann.dataset.model;
+package hr.fer.zemris.bscthesis.dataset;
 
 import hr.fer.zemris.bscthesis.classes.ClassType;
-
-import java.util.Arrays;
 
 /**
  * Models one sample used for training ANN. Each sample consists of:
  * <ul>
  *     <li>inputs,</li>
  *     <li>outputs,</li>
- *     <li>class type - {@link ClassType}</li>
+ *     <li>class type - {@link ClassType}.</li>
  * </ul>
  */
 public class Sample {
 
     private final double[] inputs;
     private final double[] outputs;
-    private ClassType classType;
+    private final ClassType classType;
 
-    public Sample(double[] inputs, double[] outputs) {
+    /**
+     * Constructor.
+     *
+     * @param inputs    inputs array.
+     * @param outputs   outputs array.
+     * @param classType class type.
+     */
+    public Sample(double[] inputs, double[] outputs, ClassType classType) {
         this.inputs = inputs;
         this.outputs = outputs;
+        this.classType = classType;
     }
 
+    /**
+     * @return samples inputs.
+     */
     public double[] getInputs() {
         return inputs;
     }
 
+    /**
+     * @return samples outputs.
+     */
     public double[] getOutputs() {
         return outputs;
     }
 
+    /**
+     * @return samples class type.
+     */
     public ClassType getClassType() {
         return classType;
-    }
-
-    public void setClassType(ClassType classType) {
-        this.classType = classType;
-    }
-
-    public boolean isCorrectClassified() {
-        return Arrays.equals(outputs, classType.getDesiredOutputs());
     }
 
 }

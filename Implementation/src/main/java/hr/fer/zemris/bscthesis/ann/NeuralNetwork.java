@@ -1,8 +1,8 @@
 package hr.fer.zemris.bscthesis.ann;
 
 import hr.fer.zemris.bscthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.bscthesis.ann.dataset.ReadOnlyDataset;
-import hr.fer.zemris.bscthesis.ann.dataset.model.Sample;
+import hr.fer.zemris.bscthesis.dataset.Dataset;
+import hr.fer.zemris.bscthesis.dataset.Sample;
 import org.apache.commons.math3.linear.ArrayRealVector;
 import org.apache.commons.math3.linear.MatrixUtils;
 import org.apache.commons.math3.linear.RealMatrix;
@@ -46,7 +46,7 @@ public class NeuralNetwork {
     /* GENERAL PARAMETERS FOR NETWORK */
     private int[] layers;
     private ActivationFunction aFunction;
-    private ReadOnlyDataset dataset;
+    private Dataset dataset;
     private LearningType learningType = LearningType.ONLINE;
     private int batchSize = 5;
     /* ------------------------------ */
@@ -70,7 +70,7 @@ public class NeuralNetwork {
     public NeuralNetwork() {
     }
 
-    public NeuralNetwork(int[] layers, ActivationFunction aFunction, ReadOnlyDataset dataset) {
+    public NeuralNetwork(int[] layers, ActivationFunction aFunction, Dataset dataset) {
         this.layers = layers;
         this.aFunction = aFunction;
         this.dataset = dataset;
@@ -88,7 +88,7 @@ public class NeuralNetwork {
         this.aFunction = aFunction;
     }
 
-    public void setDataset(ReadOnlyDataset dataset) {
+    public void setDataset(Dataset dataset) {
         this.dataset = dataset;
     }
 
@@ -286,8 +286,7 @@ public class NeuralNetwork {
     /* PREPARE BATCHES OF SAMPLES BASED ON LEARNING TYPE */
     private Collection<Collection<Sample>> prepareBatches() {
         Collection<Collection<Sample>> batches = new LinkedList<>();
-        List<Sample> samples = dataset.samples();
-        Collections.shuffle(samples);
+        List<Sample> samples = dataset.shuffleSamples();
         if (learningType == LearningType.BATCH) {
             batches.add(samples);
         } else if (learningType == LearningType.ONLINE) {

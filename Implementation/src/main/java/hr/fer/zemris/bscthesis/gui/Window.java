@@ -5,9 +5,9 @@ import hr.fer.zemris.bscthesis.ann.afunction.ActivationFunction;
 import hr.fer.zemris.bscthesis.ann.afunction.ReLU;
 import hr.fer.zemris.bscthesis.ann.afunction.Sigmoid;
 import hr.fer.zemris.bscthesis.ann.afunction.Tanh;
-import hr.fer.zemris.bscthesis.ann.dataset.Cartesian2DDataset;
-import hr.fer.zemris.bscthesis.ann.dataset.ReadOnlyDataset;
-import hr.fer.zemris.bscthesis.ann.dataset.model.Sample;
+import hr.fer.zemris.bscthesis.dataset.Cartesian2DDataset;
+import hr.fer.zemris.bscthesis.dataset.Dataset;
+import hr.fer.zemris.bscthesis.dataset.Sample;
 import hr.fer.zemris.bscthesis.classes.ClassA;
 import hr.fer.zemris.bscthesis.classes.ClassB;
 import hr.fer.zemris.bscthesis.classes.ClassC;
@@ -33,7 +33,7 @@ public class Window extends JFrame {
     private NeuralNetwork.LearningType learningType;
     private int batchSize;
     private ActivationFunction aFunction;
-    private final ReadOnlyDataset dataset = new Cartesian2DDataset();
+    private final Dataset dataset = new Cartesian2DDataset();
     private final List<Sample> samples = new ArrayList<>();
     private final List<Sample> normalized = new ArrayList<>();
     private final List<ActivationFunction> aFunctions = List.of(
@@ -258,7 +258,7 @@ public class Window extends JFrame {
             for (Sample s : samples) {
                 double[] sInputs = s.getInputs();
                 double[] inputs = {transformX(sInputs[0]), transformY(sInputs[1])};
-                normalized.add(new Sample(inputs, s.getOutputs()));
+                normalized.add(new Sample(inputs, s.getOutputs(), s.getClassType()));
             }
             dataset.setSamples(normalized);
             nn.setDataset(dataset);
@@ -318,8 +318,7 @@ public class Window extends JFrame {
                 } else {
                     double[] inputs = {e.getX(), e.getY()};
                     double[] outputs = currentClassType.getDesiredOutputs();
-                    Sample sample = new Sample(inputs, outputs);
-                    sample.setClassType(currentClassType);
+                    Sample sample = new Sample(inputs, outputs, currentClassType);
                     samples.add(sample);
                     if (!btnDeleteLast.isEnabled()) {
                         btnDeleteLast.setEnabled(true);
