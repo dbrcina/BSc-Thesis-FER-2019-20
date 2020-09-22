@@ -94,6 +94,10 @@ public abstract class ClassType {
         if (outputs.length != 3) {
             throw new RuntimeException("ClassType::rgb(double[]) doesn't support array of length: " + outputs.length);
         }
+        for (int i = 0; i < outputs.length; i++) {
+            if (outputs[i] < 0) outputs[i] = 0.0;
+            if (outputs[i] > 1) outputs[i] = 1.0;
+        }
         int r = (int) (outputs[0] * 255);
         int g = (int) (outputs[1] * 255);
         int b = (int) (outputs[2] * 255);
@@ -154,6 +158,24 @@ public abstract class ClassType {
     @Override
     public int hashCode() {
         return Objects.hash(id);
+    }
+
+    /**
+     * @return collection of all class types.
+     */
+    public static Collection<ClassType> allClassTypes() {
+        return classesForDesiredOutputs.values().stream()
+                .map(clazz -> {
+                    try {
+                        return clazz.getConstructor().newInstance();
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        System.exit(-1);
+                    }
+                    return null;
+                })
+                .sorted(Comparator.comparing(ClassType::getId))
+                .collect(Collectors.toList());
     }
 
     /**
