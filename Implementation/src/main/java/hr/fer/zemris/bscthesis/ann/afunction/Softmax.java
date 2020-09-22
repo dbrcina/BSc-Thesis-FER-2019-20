@@ -7,7 +7,7 @@ import java.util.Arrays;
  *
  * @author dbrcina
  */
-public class Softmax implements ActivationFunction {
+public class Softmax extends ActivationFunction {
 
     private final double sum;
 
@@ -21,6 +21,7 @@ public class Softmax implements ActivationFunction {
      * @param vector vector.
      */
     public Softmax(double[] vector) {
+        super("Softmax");
         sum = Arrays.stream(vector)
                 .map(Math::exp)
                 .sum();

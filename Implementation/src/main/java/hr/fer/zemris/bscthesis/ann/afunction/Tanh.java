@@ -5,7 +5,11 @@ package hr.fer.zemris.bscthesis.ann.afunction;
  *
  * @author dbrcina
  */
-public class Tanh implements ActivationFunction {
+public class Tanh extends ActivationFunction {
+
+    public Tanh() {
+        super("Tanh");
+    }
 
     @Override
     public double value(double x) {
@@ -16,11 +20,6 @@ public class Tanh implements ActivationFunction {
     public double derivativeValue(double x) {
         double tanh = value(x);
         return 1 - tanh * tanh;
-    }
-
-    @Override
-    public String toString() {
-        return "tanh";
     }
 
 }

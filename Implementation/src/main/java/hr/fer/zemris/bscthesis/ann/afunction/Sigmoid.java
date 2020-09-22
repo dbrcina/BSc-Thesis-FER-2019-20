@@ -5,7 +5,11 @@ package hr.fer.zemris.bscthesis.ann.afunction;
  *
  * @author dbrcina
  */
-public class Sigmoid implements ActivationFunction {
+public class Sigmoid extends ActivationFunction {
+
+    public Sigmoid() {
+        super("Sigmoid");
+    }
 
     @Override
     public double value(double x) {
@@ -16,11 +20,6 @@ public class Sigmoid implements ActivationFunction {
     public double derivativeValue(double x) {
         double sigma = value(x);
         return sigma * (1 - sigma);
-    }
-
-    @Override
-    public String toString() {
-        return "sigmoid";
     }
 
 }

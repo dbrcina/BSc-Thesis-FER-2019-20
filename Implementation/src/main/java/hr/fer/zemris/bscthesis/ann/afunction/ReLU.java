@@ -5,7 +5,11 @@ package hr.fer.zemris.bscthesis.ann.afunction;
  *
  * @author dbrcina
  */
-public class ReLU implements ActivationFunction {
+public class ReLU extends ActivationFunction {
+
+    public ReLU() {
+        super("ReLU");
+    }
 
     @Override
     public double value(double x) {
@@ -15,11 +19,6 @@ public class ReLU implements ActivationFunction {
     @Override
     public double derivativeValue(double x) {
         return x > 0 ? 1 : 0;
-    }
-
-    @Override
-    public String toString() {
-        return "relu";
     }
 
 }
