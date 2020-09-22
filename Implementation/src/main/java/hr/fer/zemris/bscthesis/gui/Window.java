@@ -2,16 +2,10 @@ package hr.fer.zemris.bscthesis.gui;
 
 import hr.fer.zemris.bscthesis.ann.NeuralNetwork;
 import hr.fer.zemris.bscthesis.ann.afunction.ActivationFunction;
-import hr.fer.zemris.bscthesis.ann.afunction.ReLU;
-import hr.fer.zemris.bscthesis.ann.afunction.Sigmoid;
-import hr.fer.zemris.bscthesis.ann.afunction.Tanh;
+import hr.fer.zemris.bscthesis.classes.ClassType;
 import hr.fer.zemris.bscthesis.dataset.Cartesian2DDataset;
 import hr.fer.zemris.bscthesis.dataset.Dataset;
 import hr.fer.zemris.bscthesis.dataset.Sample;
-import hr.fer.zemris.bscthesis.classes.ClassA;
-import hr.fer.zemris.bscthesis.classes.ClassB;
-import hr.fer.zemris.bscthesis.classes.ClassC;
-import hr.fer.zemris.bscthesis.classes.ClassType;
 
 import javax.swing.*;
 import javax.swing.border.EtchedBorder;
@@ -21,32 +15,40 @@ import javax.swing.event.DocumentListener;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
 import java.util.List;
+import java.util.*;
 
+/**
+ * Window used for results visualisation.
+ *
+ * @author dbrcina
+ */
 public class Window extends JFrame {
 
-    // ----NEURAL NETWORK STUFF---- //
+    /* ------------- NEURAL NETWORK STUFF ------------- */
     private final NeuralNetwork nn = new NeuralNetwork();
+    private final Map<String, ActivationFunction> aFunctions = ActivationFunction.allAFunctions();
+    private final Dataset dataset = new Cartesian2DDataset();
+    private final List<ClassType> classTypes = new ArrayList<>(ClassType.allClassTypes());
+    private final Map<String, NeuralNetwork.LearningType> learningTypes = new HashMap<>() {{
+        put("Stochastic", NeuralNetwork.LearningType.ONLINE);
+        put("Batch", NeuralNetwork.LearningType.BATCH);
+        put("Mini-Batch", NeuralNetwork.LearningType.MINI_BATCH);
+    }};
+    private final List<Sample> samples = new ArrayList<>();
+    private final List<Sample> normalizedSamples = new ArrayList<>();
+    private ClassType currentClassType = classTypes.get(0);
     private NeuralNetwork.LearningType learningType;
     private int batchSize;
-    private ActivationFunction aFunction;
-    private final Dataset dataset = new Cartesian2DDataset();
-    private final List<Sample> samples = new ArrayList<>();
-    private final List<Sample> normalized = new ArrayList<>();
-    private final List<ActivationFunction> aFunctions = List.of(
-            new Sigmoid(), new ReLU(), new Tanh());
-    // ---------------------------- //
+    /* ----------------------------------------------- */
 
-    // ----CANVAS COMPONENT---- //
-    private static final int CANVAS_WIDTH = 400;
-    private static final int CANVAS_HEIGHT = 300;
+    /* -------------- CANVAS COMPONENT --------------- */
+    private static final int CANVAS_WIDTH = 500;
+    private static final int CANVAS_HEIGHT = 400;
     private JComponent canvas;
-    // ------------------------ //
+    /* ----------------------------------------------- */
 
-    // ----OPTIONS PANEL---- //
+    /* ---------------- OPTIONS PANEL ---------------- */
     private JPanel panelOptions;
     private JLabel lblBPType;
     private JComboBox<String> boxBPType;
@@ -61,41 +63,34 @@ public class Window extends JFrame {
     private JLabel lblClassType;
     private JTextField fldClassType;
     private ButtonGroup btnGroup;
-    private JRadioButton btnSigmoid;
-    private JRadioButton btnReLu;
-    private JRadioButton btnTanh;
+    private JRadioButton[] btnAFunctions;
     private JButton btnTrain;
     private JButton btnStop;
     private JButton btnDeleteLast;
     private JButton btnClearAll;
-    // -------------------- //
+    /* ----------------------------------------------- */
 
-    // --- CLASS TYPE STUFF --- //
-    private final List<ClassType> classTypes = List.of(new ClassA(), new ClassB(), new ClassC());
-    private ClassType currentClassType = classTypes.get(0);
-    // ------------------------ //
-
-    // --- HELPER VARIABLES --- //
+    /* --------------- HELPER VARIABLES -------------- */
     private boolean training;
-    // ------------------------ //
+    /* ----------------------------------------------- */
 
-    // ---- CONSTRUCTOR ---- //
+    /* ----------------- CONSTRUCTOR ----------------- */
     public Window() {
         setResizable(false);
         setTitle("ANN classification");
-        setDefaultCloseOperation(EXIT_ON_CLOSE);
+        setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         initGUI();
         pack();
         setLocationRelativeTo(null);
     }
-    // --------------------- //
+    /* ----------------------------------------------- */
 
+    /* ---------- INITIALIZE GUI COMPONENTS ---------- */
     private void initGUI() {
         initPanelOptions();
         initCanvasComponent();
     }
 
-    // ---- INITIALIZE OPTIONS PANEL ! ----- //
     private void initPanelOptions() {
         panelOptions = new JPanel(new GridLayout(6, 1));
         addFirstRow();
@@ -110,7 +105,7 @@ public class Window extends JFrame {
     private void addFirstRow() {
         JPanel panelComboBox = new JPanel();
         lblBPType = new JLabel("Backpropagation type:");
-        boxBPType = new JComboBox<>(new String[]{"Stochastic", "Batch", "Mini_Batch"});
+        boxBPType = new JComboBox<>(learningTypes.keySet().toArray(new String[0]));
         panelComboBox.add(lblBPType);
         panelComboBox.add(boxBPType);
         panelOptions.add(panelComboBox);
@@ -159,7 +154,7 @@ public class Window extends JFrame {
             public void changedUpdate(DocumentEvent e) {
             }
         });
-        fldClassType.setText(currentClassType.toString());
+        fldClassType.setText(currentClassType.getId());
         panelClassType.add(lblClassType);
         panelClassType.add(fldClassType);
         panelOptions.add(panelClassType);
@@ -168,16 +163,15 @@ public class Window extends JFrame {
     private void addFifthRow() {
         JPanel panelButtons = new JPanel();
         btnGroup = new ButtonGroup();
-        btnSigmoid = new JRadioButton("Sigmoid neuron");
-        btnSigmoid.setSelected(true);
-        btnReLu = new JRadioButton("ReLu neuron");
-        btnTanh = new JRadioButton("Tanh neuron");
-        btnGroup.add(btnSigmoid);
-        btnGroup.add(btnReLu);
-        btnGroup.add(btnTanh);
-        panelButtons.add(btnSigmoid);
-        panelButtons.add(btnReLu);
-        panelButtons.add(btnTanh);
+        btnAFunctions = new JRadioButton[aFunctions.size()];
+        int i = 0;
+        for (String aFunctionId : aFunctions.keySet()) {
+            JRadioButton btnAFunction = new JRadioButton(aFunctionId + " neuron");
+            btnGroup.add(btnAFunction);
+            panelButtons.add(btnAFunction);
+            btnAFunctions[i++] = btnAFunction;
+        }
+        btnAFunctions[0].setSelected(true);
         panelOptions.add(panelButtons);
     }
 
@@ -219,88 +213,103 @@ public class Window extends JFrame {
             }
         });
         btnTrain.addActionListener(evt -> {
-            int[] hiddenLayers = Arrays.stream(fldHiddenLayers.getText().split(","))
-                    .mapToInt(Integer::parseInt)
-                    .filter(i -> i > 0)
-                    .toArray();
-            int[] layers = new int[1 + hiddenLayers.length + 1];
-            // input layer
-            layers[0] = 2;
-            // output layer
-            layers[layers.length - 1] = classTypes.size();
-            // hidden layers
-            int offset = 1;
-            for (int hLayer : hiddenLayers) {
-                layers[offset++] = hLayer;
-            }
-            nn.setLayers(layers);
-            Enumeration<AbstractButton> buttons = btnGroup.getElements();
-            while (buttons.hasMoreElements()) {
-                AbstractButton btn = buttons.nextElement();
-                if (btn.isSelected()) {
-                    switch (btn.getText().split("\\s+")[0]) {
-                        case "Sigmoid":
-                            aFunction = aFunctions.get(0);
-                            break;
-                        case "ReLu":
-                            aFunction = aFunctions.get(1);
-                            break;
-                        case "Tanh":
-                            aFunction = aFunctions.get(2);
-                            break;
-                        default:
-                    }
-                    break;
-                }
-            }
-            nn.setAFunction(aFunction);
-            normalized.clear();
-            for (Sample s : samples) {
-                double[] sInputs = s.getInputs();
-                double[] inputs = {transformX(sInputs[0]), transformY(sInputs[1])};
-                normalized.add(new Sample(inputs, s.getOutputs(), s.getClassType()));
-            }
-            dataset.setSamples(normalized);
-            nn.setDataset(dataset);
-            String type = (String) boxBPType.getSelectedItem();
-            if (type.equals("Stochastic")) {
-                learningType = NeuralNetwork.LearningType.ONLINE;
-            } else if (type.equals("Batch")) {
-                learningType = NeuralNetwork.LearningType.BATCH;
-            } else {
-                learningType = NeuralNetwork.LearningType.MINI_BATCH;
-            }
-            if (learningType == NeuralNetwork.LearningType.MINI_BATCH) {
-                do {
-                    String bSize = JOptionPane.showInputDialog(this, "Enter batch size:");
-                    if (bSize == null || !bSize.matches("^[1-9]\\d*$")) {
-                        JOptionPane.showMessageDialog(this, "Enter natural number.");
-                    } else {
-                        batchSize = Integer.parseInt(bSize);
-                        break;
-                    }
-                } while (true);
-            }
-            nn.setLearningType(learningType);
-            nn.setBatchSize(batchSize);
-            nn.setCanvas(canvas);
-            nn.setRedrawEveryNEpoch(1000);
-            int epochs = Integer.parseInt(fldIter.getText());
-            double maxError = Double.parseDouble(fldErr.getText());
-            double eta = Double.parseDouble(fldEta.getText());
-            new Thread(() -> {
-                training = true;
-                nn.train(epochs, maxError, eta);
-                btnStop.setEnabled(false);
-                canvas.repaint();
-            }).start();
-            btnStop.setEnabled(true);
+            parseAndSetLayers();
+            parseAndSetAFunction();
+            parseAndSetDatasetSamples();
+            parseAndSetLearningType();
+            parseAndSetBatchSize();
+            parseAndSetVisualisationParams();
+            parseAndStartTraining();
         });
         btnStop.addActionListener(evt -> nn.stop());
     }
-    // ------------------------------------- //
 
-    // ---- INITIALIZE CANVAS COMPONENT ! ----- //
+    private void parseAndSetLayers() {
+        int[] hiddenLayers = Arrays.stream(fldHiddenLayers.getText().split(","))
+                .mapToInt(Integer::parseInt)
+                .filter(i -> i > 0)
+                .toArray();
+        int[] layers = new int[1 + hiddenLayers.length + 1];
+        // input layer
+        layers[0] = 2;
+        // output layer
+        layers[layers.length - 1] = classTypes.size();
+        // hidden layers
+        int offset = 1;
+        for (int hLayer : hiddenLayers) {
+            layers[offset++] = hLayer;
+        }
+        nn.setLayers(layers);
+    }
+
+    private void parseAndSetAFunction() {
+        Enumeration<AbstractButton> buttons = btnGroup.getElements();
+        while (buttons.hasMoreElements()) {
+            AbstractButton btn = buttons.nextElement();
+            if (btn.isSelected()) {
+                // ID neuron
+                String aFunctionId = btn.getText().split("\\s+")[0];
+                nn.setAFunction(aFunctions.get(aFunctionId));
+                break;
+            }
+        }
+    }
+
+    private void parseAndSetDatasetSamples() {
+        normalizedSamples.clear();
+        for (Sample s : samples) {
+            double[] sInputs = s.getInputs();
+            double[] inputs = {transformX(sInputs[0]), transformY(sInputs[1])};
+            normalizedSamples.add(new Sample(inputs, s.getOutputs(), s.getClassType()));
+        }
+        dataset.setSamples(normalizedSamples);
+        nn.setDataset(dataset);
+    }
+
+    private void parseAndSetLearningType() {
+        String type = (String) boxBPType.getSelectedItem();
+        learningType = learningTypes.get(type);
+        nn.setLearningType(learningType);
+    }
+
+    private void parseAndSetBatchSize() {
+        if (learningType == NeuralNetwork.LearningType.MINI_BATCH) {
+            do {
+                String bSize = JOptionPane.showInputDialog(this, "Enter batch size:");
+                if (bSize == null) {
+                    break;
+                }
+                if (!bSize.matches("^[1-9]\\d*$")) {
+                    JOptionPane.showMessageDialog(this, "Enter natural number.");
+                } else {
+                    batchSize = Integer.parseInt(bSize);
+                    break;
+                }
+            } while (true);
+        }
+        nn.setBatchSize(batchSize);
+    }
+
+    private void parseAndSetVisualisationParams() {
+        nn.setCanvas(canvas);
+        nn.setRedrawEveryNEpoch(1000);
+    }
+
+    private void parseAndStartTraining() {
+        int epochs = Integer.parseInt(fldIter.getText());
+        double maxError = Double.parseDouble(fldErr.getText());
+        double eta = Double.parseDouble(fldEta.getText());
+        new Thread(() -> {
+            training = true;
+            nn.train(epochs, maxError, eta);
+            btnStop.setEnabled(false);
+            canvas.repaint();
+        }).start();
+        btnStop.setEnabled(true);
+    }
+    /* ----------------------------------------------- */
+
+    /* --------- INITIALIZE CANVAS COMPONENT --------- */
     private void initCanvasComponent() {
         canvas = new CanvasComponent(this, CANVAS_WIDTH, CANVAS_HEIGHT);
         canvas.addMouseListener(new MouseAdapter() {
@@ -314,7 +323,7 @@ public class Window extends JFrame {
                         classTypesIndex++;
                     }
                     currentClassType = classTypes.get(classTypesIndex);
-                    fldClassType.setText(currentClassType.toString());
+                    fldClassType.setText(currentClassType.getId());
                 } else {
                     double[] inputs = {e.getX(), e.getY()};
                     double[] outputs = currentClassType.getDesiredOutputs();
@@ -332,17 +341,17 @@ public class Window extends JFrame {
         });
         getContentPane().add(canvas);
     }
-    // ---------------------------------------- //
+    /* ----------------------------------------------- */
 
+    /* --------------- HELPER METHODS ---------------- */
     private double transformX(double x) {
         return x / canvas.getSize().getWidth();
     }
 
     private double transformY(double y) {
-        return 1.0 * y / canvas.getSize().getHeight();
+        return y / canvas.getSize().getHeight();
     }
-
-    // ---------------------------------------- //
+    /* ----------------------------------------------- */
 
     /**
      * Canvas which represents Cartesian 2D coordinate system.
@@ -372,31 +381,14 @@ public class Window extends JFrame {
             drawControlPoints(g2d, grid, window.training);
         }
 
-        private void drawControlPoints(Graphics2D g2d, Rectangle grid, boolean training) {
-            g2d.setStroke(new BasicStroke(2));
-            for (Sample sample : window.samples) {
-                double[] inputs = sample.getInputs();
-                int x = (int) inputs[0] - grid.x;
-                int y = (int) inputs[1] - grid.y;
-                int width = 8;
-                int height = 8;
-                ClassType classType = sample.getClassType();
-                Shape shape = classType.createShape(new Rectangle(x - width / 2, y - height / 2, width,
-                        height));
-                if (training) {
-                    g2d.setColor(Color.WHITE);
-                    g2d.draw(shape);
-                    double[] outputs = window.nn.feedForward(
-                            new double[]{window.transformX(inputs[0]), window.transformY(inputs[1])});
-                    ClassType actualClass = ClassType.determineFor(outputs);
-                    if (!classType.equals(actualClass)) {
-                        g2d.setColor(Color.BLACK);
-                    }
-                } else {
-                    g2d.setColor(classType.getColor());
-                }
-                g2d.fill(shape);
-            }
+        private Rectangle rectangularGrid() {
+            Insets insets = getInsets();
+            Dimension dimension = getSize();
+            int x = insets.left;
+            int y = insets.top;
+            int width = dimension.width - insets.left - insets.right - 1;
+            int height = dimension.height - insets.top - insets.bottom;
+            return new Rectangle(x, y, width, height);
         }
 
         private void drawTraining(Graphics2D g2d, Rectangle grid) {
@@ -411,14 +403,31 @@ public class Window extends JFrame {
             }
         }
 
-        private Rectangle rectangularGrid() {
-            Insets insets = getInsets();
-            Dimension dimension = getSize();
-            int x = insets.left;
-            int y = insets.top;
-            int width = dimension.width - insets.left - insets.right - 1;
-            int height = dimension.height - insets.top - insets.bottom;
-            return new Rectangle(x, y, width, height);
+        private void drawControlPoints(Graphics2D g2d, Rectangle grid, boolean training) {
+            g2d.setStroke(new BasicStroke(2));
+            for (Sample sample : window.samples) {
+                double[] inputs = sample.getInputs();
+                int x = (int) inputs[0] - grid.x;
+                int y = (int) inputs[1] - grid.y;
+                int width = 8;
+                int height = 8;
+                ClassType classType = sample.getClassType();
+                Shape shape = classType.createShape(new Rectangle(
+                        x - width / 2, y - height / 2, width, height));
+                if (training) {
+                    g2d.setColor(Color.WHITE);
+                    g2d.draw(shape);
+                    double[] outputs = window.nn.feedForward(
+                            new double[]{window.transformX(inputs[0]), window.transformY(inputs[1])});
+                    ClassType actualClass = ClassType.determineFor(outputs);
+                    if (!classType.equals(actualClass)) {
+                        g2d.setColor(Color.BLACK);
+                    }
+                } else {
+                    g2d.setColor(classType.getColor());
+                }
+                g2d.fill(shape);
+            }
         }
 
     }
